@@ -5,8 +5,10 @@ import * as waxjs from "@waxio/waxjs/dist";
 import { sha256, sha224 } from 'js-sha256';
 import { Button, Menu, Row, Col, Divider ,Space, Table, Typography, Layout,Input,Slider,InputNumber} from 'antd';
 import { MailOutlined, AppstoreOutlined, SettingOutlined, LineChartOutlined, StockOutlined, LoginOutlined, AuditOutlined } from '@ant-design/icons';
+import Icon from '@ant-design/icons';
 
 import { getData } from "./ultils"
+import nftsWaxList from "./nftsList"
 import PropTypes from "prop-types";
 
 import { scaleTime } from "d3-scale";
@@ -18,6 +20,7 @@ import { XAxis, YAxis } from "react-stockcharts/lib/axes";
 import { curveMonotoneX } from "d3-shape";
 import { fitWidth } from "react-stockcharts/lib/helper";
 import { last, createVerticalLinearGradient, hexToRGBA } from "react-stockcharts/lib/utils";
+
 
 
 function App() {
@@ -163,6 +166,7 @@ function App() {
       key: 'action',
     },
   ];
+
   const canvasGradient = createVerticalLinearGradient([
     { stop: 0, color: hexToRGBA("#b5d0ff", 0.2) },
     { stop: 0.7, color: hexToRGBA("#6fa4fc", 0.4) },
@@ -270,21 +274,33 @@ function App() {
             Wallet
           </Menu.Item>
           <Menu.SubMenu key="SubMenu" title="Tradding" icon={<LineChartOutlined />}>
-            <Menu.ItemGroup title="WAX">
-                <Menu.Item key="drillWax" icon={<StockOutlined />} >
-                  Drill/Wax
-                </Menu.Item>
-                <Menu.Item key="PowerWax" icon={<StockOutlined />}>
-                  Power saw/Wax
-                </Menu.Item>
-              </Menu.ItemGroup>
             <Menu.ItemGroup title="TLM">
-              <Menu.Item key="drillTlm" icon={<StockOutlined />}>
-                Drill/Tlm
-              </Menu.Item>
-              <Menu.Item key="powerTlm" icon={<StockOutlined />}>
-                Power saw/Tlm
-              </Menu.Item>
+                {
+                  nftsWaxList.map((item)=> {
+                    return (
+                    <Menu.Item style={{display: 'table'}} key={item.symbol} icon={<Icon component={() => (<img className="ant-menu-item" src={item.image} />)} />}>
+                          <span style={{display: 'table-cell', verticalAlign: 'top'}}>
+                            {item.name}/Tlm
+                          </span>
+                      </Menu.Item>
+                    )
+                  })
+                }
+                  
+                
+              </Menu.ItemGroup>
+            <Menu.ItemGroup title="WAX">
+              {
+                nftsWaxList.map((item)=> {
+                  return (
+                  <Menu.Item style={{display: 'table'}} key={item.symbol} icon={<Icon component={() => (<img className="ant-menu-item" src={item.image} />)} />}>
+                        <span style={{display: 'table-cell', verticalAlign: 'top'}}>
+                          {item.name}/Wax
+                        </span>
+                    </Menu.Item>
+                  )
+                })
+              }
             </Menu.ItemGroup>
           </Menu.SubMenu>
           {userAccount && (
