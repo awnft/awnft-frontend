@@ -24,10 +24,19 @@ import { last, createVerticalLinearGradient, hexToRGBA } from "react-stockcharts
 
 import {Link} from "react-router-dom" ;
 import { useLocation, useParams } from 'react-router';
-import queryString from 'query-string';
+import axios from 'axios';
 
 function Tradding(props) {
   var wax;
+  // const myChain = {
+  //   chainId: '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4',
+  //   rpcEndpoints: [{
+  //     protocol: 'https',
+  //     host: 'wax.greymass.com',
+  //     port: '443',
+  //   }]
+  // }
+  const [pubKeys, setPubKeys] = useState('No Public Keys')
   const location = useLocation();
   const params = useParams();
   const { Title } = Typography;
@@ -36,7 +45,8 @@ function Tradding(props) {
   const [userAccount, setUserAccount] = useState('');
   
   const [waxAcc, setWaxAcc] = useState('');
-  const [balance, setBalance] = useState('');
+  const [balance, setBalance] = useState(null);
+  const [balanceSymbol, setBalanceSymbol] = useState([]);
   const [orderBuy, setOrderBuy] = useState([{
     key: '1',
     price: 52,
@@ -179,10 +189,76 @@ function Tradding(props) {
     { stop: 1, color: hexToRGBA("#4286f4", 0.8) },
   ]);
   
-  
-  useEffect(() => {
+  // --- Get data wallet ---//
+  const getBlance = async (userAccount) => {
+    if(userAccount){
+      if(pairSymbol.toUpperCase() == 'TLM'){
+        axios({
+          method: 'post',
+          url: 'https://wax.greymass.com/v1/chain/get_currency_balance',
+          data: JSON.stringify({"code":"alien.worlds","account":userAccount,"symbol":pairSymbol.toUpperCase()})
+        }).then(res => {
+          if(res.data){
+            setBalance(parseFloat(res.data[0]));
+          }else{
+            setBalance(null);
+          }
+          
+        })
+        .catch(error => console.log(error));
+      }else{
+        axios({
+          method: 'post',
+          url: 'https://wax.greymass.com/v1/chain/get_account',
+          data: JSON.stringify({"account_name":userAccount})
+        }).then(res => {
+          if(res.data){
+            setBalance(parseFloat(res.data.core_liquid_balance));
+          }else{
+            setBalance(null);
+          }
+          
+        })
+        .catch(error => console.log(error));
+      }
+    }  
+  }
+
+  const getBlanceNfts = async (userAccount) => {
+    if(userAccount){
+      console.log(symbolCurent);
+      axios.get(`https://wax.api.atomicassets.io/atomicassets/v1/assets?owner=`+userAccount+`&collection_name=alien.worlds&template_id=`+symbolCurent.template_id+`&limit=1000`)
+      .then(res => {
+        
+        if(res.data){
+          setBalanceSymbol([...res.data.data])
+        }else{
+          setBalanceSymbol([]);
+        }
+      })
+      .catch(error => console.log(error));
+    }
     
-   
+  }
+
+  // -- End get dât wallet
+  useEffect(() => { 
+    
+    if(params.symbol){
+        const newSymbol = nftsWaxList.filter((item) => item.symbol == params.symbol);
+        setSymbolCurent(newSymbol[0]);
+        console.log(newSymbol[0]);
+    }
+    if(params.pair){
+      setPairSymbol(params.pair);
+    }
+    
+    
+  },[params])
+  useEffect(() => { 
+    clearData()
+  },[symbolCurent,pairSymbol])
+  useEffect(() => {
     //wax = new waxjs.WaxJS('https://wax.greymass.com', null, null, false);
     wax = new waxjs.WaxJS({
       rpcEndpoint: 'https://wax.greymass.com'
@@ -192,21 +268,17 @@ function Tradding(props) {
     // console.log('started wax:', wax);
     getData().then(data => {
       setDataChart(data)
-      console.log(dataChart)
-      console.log(data)
     })
     
   },[]);
-  useEffect(() => { 
-    if(params.symbol){
-        const newSymbol = nftsWaxList.filter((item) => item.symbol == params.symbol);
-        setSymbolCurent(newSymbol[0]);
-    }
-    if(params.pair){
-      const newSymbol = nftsWaxList.filter((item) => item.symbol == params.symbol);
-      setPairSymbol(params.pair);
+  
+  const clearData = () => {
+    setBalance(null);
+    setBalanceSymbol([]);
+    getBlance(userAccount);
+    getBlanceNfts(userAccount);
   }
-  },[params])
+  
   const fromHexString = (hexString) =>
   new Uint8Array(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)))
 
@@ -236,45 +308,32 @@ function Tradding(props) {
   async function checkAutoLoginAndLogin(){
     var isAutoLoginAwailable = await wax.isAutoLoginAvailable();
     console.log("Auto login", isAutoLoginAwailable);
+    var userAccount2 = wax.userAccount
+    var pubKeys2 = wax.pubKeys
+    setUserAccount(userAccount2);
+    setPubKeys(pubKeys2);
+    getBlance(userAccount2);
+    getBlanceNfts(userAccount2);
+  }
+  const settingLogin = () => {
     login();
   }
+  
   async function login(){
     console.log('Logging in');
    
     try {
-      const userAccount = await wax.login();
-      // const actions = [
-      //   {
-      //     account: "m.federation",
-      //     name: "mine",
-      //     authorization: [
-      //       {
-      //         actor: userAccount,
-      //         permission: "active",
-      //       },
-      //     ],
-      //     data: {
-      //       miner: userAccount,
-      //       nonce: 'f4a7636591f9c29b'
-      //     }
-      //   },
-      // ];
-      // await wax.api
-      //   .transact(
-      //     {
-      //       actions,
-      //     },
-      //     {
-      //       blocksBehind: 3,
-      //       expireSeconds: 90,
-      //     }
-      //   )
-      //   .then((result) => {
-      //      console.log(result);
-      //   })
-      setUserAccount(userAccount);
-      const pubKeys = wax.pubKeys;
-      console.log('User logged as:',userAccount, pubKeys);
+      wax = new waxjs.WaxJS({
+        rpcEndpoint: 'https://wax.greymass.com'
+      });
+      const userAccount2 = await wax.login();
+      setUserAccount(userAccount2);
+      const pubKeys2 = wax.pubKeys;
+      console.log('User logged as:',userAccount2, pubKeys);
+      setPubKeys(pubKeys2);
+      getBlance(userAccount2);
+      getBlanceNfts(userAccount2);
+      
     } catch (error){
       console.error('User fail to login.', error);
     }
@@ -292,17 +351,20 @@ function Tradding(props) {
                     <Typography.Text>
                         NFT Name: {symbolCurent.name}
                         <br/>
-                        Rarity: Abundant
+                        Shine: Stone
                     </Typography.Text>
                     <Typography.Text>
                         Pair: {symbolCurent.symbol}/Tlm
                         <br/>
-                        Vol: 1,000 {symbolCurent.symbol}
+                        Template Id: {symbolCurent.template_id}
                     </Typography.Text>
                     <Typography.Text>
-                        Low: 48
+                        Vol: - {symbolCurent.symbol}
+                    </Typography.Text>
+                    <Typography.Text>
+                        Low: -
                         <br/>
-                        Height: 54
+                        Height: -
                     </Typography.Text>
                 </Space>
                 
@@ -329,7 +391,7 @@ function Tradding(props) {
                 {
                   nftsWaxList.map((item)=> {
                     return (
-                    <Menu.Item style={{display: 'table'}} key={item.symbol} icon={<Icon component={() => (<img className="ant-menu-item" src={item.image} />)} />}>
+                      <Menu.Item style={{display: 'table'}} key={item.symbol+'tlm'} icon={<Icon component={() => (<img className="ant-menu-item" src={item.image} />)} />}>
                           <span style={{display: 'table-cell', verticalAlign: 'top'}}>
                             <Link to={`/tradding/`+item.symbol+'/Tlm'}>{item.name}/Tlm</Link>
                           </span>
@@ -344,7 +406,7 @@ function Tradding(props) {
               {
                 nftsWaxList.map((item)=> {
                   return (
-                  <Menu.Item style={{display: 'table'}} key={item.symbol} icon={<Icon component={() => (<img className="ant-menu-item" src={item.image} />)} />} >
+                  <Menu.Item style={{display: 'table'}} key={item.symbol+'wax'} icon={<Icon component={() => (<img className="ant-menu-item" src={item.image} />)} />} >
                         <span style={{display: 'table-cell', verticalAlign: 'top'}}>
                           <Link to={`/tradding/`+item.symbol+'/Wax'}>{item.name}/Wax</Link>
                         </span>
@@ -363,7 +425,7 @@ function Tradding(props) {
           }
           {!userAccount && (
                   <Menu.Item key="login" icon={<LoginOutlined />}>
-                    <Button onClick={login}>Login</Button>
+                    <Button onClick={login()}>Login</Button>
                   </Menu.Item>
                 )
           }
@@ -447,12 +509,12 @@ function Tradding(props) {
                     <Space direction="vertical">
                       <Title level={5}>Buy</Title>
                         <Typography.Text className="ant-form-text" type="secondary">
-                          Balance: 5,000 Wax
+                          Balance: {balance ? balance: '-'} {pairSymbol}
                         </Typography.Text>
                         <Input addonBefore="Price"  addonAfter={pairSymbol} defaultValue="" value={buyPrice} onChange={(v) => setBuyPrice(v.target.value)}/>
-                        <InputNumber min={1} max={100} addonBefore="Amount" addonAfter={symbolCurent.symbol}  value={buyAmount} onChange={(v) => setBuyAmount(Math.floor(v))}/>
+                        <InputNumber min={1} addonBefore="Amount" addonAfter={symbolCurent.symbol}  value={buyAmount} onChange={(v) => setBuyAmount(Math.floor(v))}/>
                         
-                        <Slider defaultValue={0} marks={{0:'0%', 25: '25%', 50: '50%', 75: '75%', 100: '100%'}} onChange={(v)=> console.log(v)}/>
+                        <Slider defaultValue={0} marks={{0:'0%', 25: '25%', 50: '50%', 75: '75%', 100: '100%'}} onChange={(v) => setBuyAmount(Math.floor(balance/buyPrice*v/100)) }/>
                         <Input addonBefore="Total"  addonAfter={pairSymbol} defaultValue="" value={sellPrice && buyAmount ? buyPrice*buyAmount : ''}/>
 
                         <Button style={{ width: "100%" }} onClick={login} type="primary" success>Buy {symbolCurent.name}</Button>
@@ -464,11 +526,11 @@ function Tradding(props) {
                     <Space direction="vertical">
                       <Title level={5}>Sell</Title>
                       <Typography.Text className="ant-form-text" type="secondary">
-                          Balance: 15 {symbolCurent.name}
+                          Balance: {balanceSymbol.length} {symbolCurent.name}
                       </Typography.Text>
                       <Input addonBefore="Price"  addonAfter={pairSymbol} defaultValue="" value={sellPrice} onChange={(v) => setSellPrice(v.target.value)}/>
-                      <InputNumber min={1} max={100} addonBefore="Amount" addonAfter={symbolCurent.symbol}  value={sellAmount} onChange={(v) => setSellAmount(Math.floor(v))} />
-                      <Slider defaultValue={0} marks={{0:'0%', 25: '25%', 50: '50%', 75: '75%', 100: '100%'}} />
+                      <InputNumber min={1} addonBefore="Amount" addonAfter={symbolCurent.symbol}  value={sellAmount} onChange={(v) => setSellAmount(Math.floor(v))} />
+                      <Slider defaultValue={0} marks={{0:'0%', 25: '25%', 50: '50%', 75: '75%', 100: '100%'}} onChange={(v) => setSellAmount(Math.floor(balanceSymbol.length*v/100)) }/>
                       <Input addonBefore="Total"  addonAfter={pairSymbol} value={sellPrice && sellAmount ? sellPrice*sellAmount : ''} />
                       <Button style={{ width: "100%" }} onClick={login} type="primary" danger>Sell {symbolCurent.name}</Button>
                     </Space>
@@ -477,7 +539,7 @@ function Tradding(props) {
             </Col>
           </Row>
       </Content>   
-      <Footer style={{ textAlign: 'center' }}> ©2022 Created by Cleancodevietnam</Footer>
+      <Footer style={{ textAlign: 'center' }}> ©2022 Created by Alienworlds marketplace</Footer>
     </Layout>
   );
 }

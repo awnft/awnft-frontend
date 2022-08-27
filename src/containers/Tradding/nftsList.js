@@ -21,87 +21,104 @@ const list = [
 		{
 			name: 'Standard Shovel',
 			symbol: 'StandardShovel',
-			image: StandardShovel
+			image: StandardShovel,
+			template_id: 19552,
 		},
 		{
 			name: 'Standard Drill',
 			symbol: 'StandardDrill',
-			image: StandardDrill
+			image: StandardDrill,
+			template_id: 19553,
 		},
 		{
 			name: 'Standard Capacitor',
 			symbol: 'StandardCapacitor',
-			image: StandardCapacitor
+			image: StandardCapacitor,
+			template_id: 19558,
 		},
 		{
 			name: 'RD9000 Excavator',
 			symbol: 'RD9000Excavator',
-			image: RD9000Excavator
+			image: RD9000Excavator,
+			template_id: 19572,
 		},
 		{
 			name: 'Quark Separator',
 			symbol: 'QuarkSeparator',
-			image: QuarkSeparator
+			image: QuarkSeparator,
+			template_id: 19570,
 		},
 		{
 			name: 'Processing Ring',
 			symbol: 'ProcessingRing',
-			image: ProcessingRing
+			image: ProcessingRing,
+			template_id: 19564,
 		},
 		{
 			name: 'Power Extractor',
 			symbol: 'PowerExtractor',
-			image: PowerExtractor
+			image: PowerExtractor,
+			template_id: 19554,
 		},
 		{
 			name: 'Large Explosive',
 			symbol: 'LargeExplosive',
-			image: LargeExplosive
+			image: LargeExplosive,
+			template_id: 19567,
 		},
 		{
 			name: 'Large Capacitor',
 			symbol: 'LargeCapacitor',
-			image: LargeCapacitor
+			image: LargeCapacitor,
+			template_id: 19563,
 		},
 		{
 			name: 'Infused Extractor',
 			symbol: 'InfusedExtractor',
-			image: InfusedExtractor
+			image: InfusedExtractor,
+			template_id: 19556,
 		},
 		{
 			name: 'Glavor Disc',
 			symbol: 'GlavorDisc',
-			image: GlavorDisc
+			image: GlavorDisc,
+			template_id: 19565,
 		},
 		{
 			name: 'Gasrigged Extractor',
 			symbol: 'GasriggedExtractor',
-			image: GasriggedExtractor
+			image: GasriggedExtractor,
+			template_id: 19555,
 		},
 		{
 			name: 'Draxos Axe',
 			symbol: 'DraxosAxe',
-			image: DraxosAxe
+			image: DraxosAxe,
+			template_id: 19562,
 		},
 		{
 			name: 'Causian Attractor',
 			symbol: 'CausianAttractor',
-			image: CausianAttractor
+			image: CausianAttractor,
+			template_id: 19569,
 		},
 		{
 			name: 'Basic Trilium Detector',
 			symbol: 'BasicTriliumDetector',
-			image: BasicTriliumDetector
+			image: BasicTriliumDetector,
+			template_id: 19559,
 		},
 		{
 			name: 'Barrel Digger',
 			symbol: 'BarrelDigger',
-			image: BarrelDigger
+			image: BarrelDigger,
+			template_id: 19568,
 		},
 		{
 			name: 'Artunian Shovel',
 			symbol: 'ArtunianShovel',
-			image: ArtunianShovel
+			image: ArtunianShovel,
+			template_id: 19566,
 		},
 	];
 
