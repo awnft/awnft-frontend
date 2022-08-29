@@ -207,6 +207,10 @@ function Tradding(props) {
         })
         .catch(error => console.log(error));
       }else{
+        // eosio.token
+        // https://wax.alcor.exchange/api/markets
+        // https://wax.alcor.exchange/api/account/..../deals?limit=100&skip=0
+
         axios({
           method: 'post',
           url: 'https://wax.greymass.com/v1/chain/get_account',
@@ -507,15 +511,15 @@ function Tradding(props) {
                   
                     <Input.Group size="large"></Input.Group>
                     <Space direction="vertical">
-                      <Title level={5}>Buy</Title>
+                      <Title level={5}>Buy {symbolCurent.name} | Limit trade</Title>
                         <Typography.Text className="ant-form-text" type="secondary">
-                          Balance: {balance ? balance: '-'} {pairSymbol}
+                          Balance: {balance ? new Intl.NumberFormat().format(balance): '-'} {pairSymbol}
                         </Typography.Text>
                         <Input addonBefore="Price"  addonAfter={pairSymbol} defaultValue="" value={buyPrice} onChange={(v) => setBuyPrice(v.target.value)}/>
                         <InputNumber min={1} addonBefore="Amount" addonAfter={symbolCurent.symbol}  value={buyAmount} onChange={(v) => setBuyAmount(Math.floor(v))}/>
                         
                         <Slider defaultValue={0} marks={{0:'0%', 25: '25%', 50: '50%', 75: '75%', 100: '100%'}} onChange={(v) => setBuyAmount(Math.floor(balance/buyPrice*v/100)) }/>
-                        <Input addonBefore="Total"  addonAfter={pairSymbol} defaultValue="" value={sellPrice && buyAmount ? buyPrice*buyAmount : ''}/>
+                        <Input addonBefore="Total"  addonAfter={pairSymbol} defaultValue="" value={sellPrice && buyAmount ? new Intl.NumberFormat().format(buyPrice*buyAmount) : ''} disabled/>
 
                         <Button style={{ width: "100%" }} onClick={login} type="primary" success>Buy {symbolCurent.name}</Button>
                       
@@ -524,14 +528,14 @@ function Tradding(props) {
                   </Col>
                   <Col xs={{span: 12}}>
                     <Space direction="vertical">
-                      <Title level={5}>Sell</Title>
+                      <Title level={5}>Sell {symbolCurent.name} | Limit trade</Title>
                       <Typography.Text className="ant-form-text" type="secondary">
-                          Balance: {balanceSymbol.length} {symbolCurent.name}
+                          Balance: {new Intl.NumberFormat().format(balanceSymbol.length)} {symbolCurent.name}
                       </Typography.Text>
                       <Input addonBefore="Price"  addonAfter={pairSymbol} defaultValue="" value={sellPrice} onChange={(v) => setSellPrice(v.target.value)}/>
                       <InputNumber min={1} addonBefore="Amount" addonAfter={symbolCurent.symbol}  value={sellAmount} onChange={(v) => setSellAmount(Math.floor(v))} />
                       <Slider defaultValue={0} marks={{0:'0%', 25: '25%', 50: '50%', 75: '75%', 100: '100%'}} onChange={(v) => setSellAmount(Math.floor(balanceSymbol.length*v/100)) }/>
-                      <Input addonBefore="Total"  addonAfter={pairSymbol} value={sellPrice && sellAmount ? sellPrice*sellAmount : ''} />
+                      <Input addonBefore="Total"  addonAfter={pairSymbol} value={sellPrice && sellAmount ? new Intl.NumberFormat().format(sellPrice*sellAmount) : ''} disabled/>
                       <Button style={{ width: "100%" }} onClick={login} type="primary" danger>Sell {symbolCurent.name}</Button>
                     </Space>
                   </Col>
