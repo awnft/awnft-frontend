@@ -1,53 +1,45 @@
-
-import React, { useEffect,useLayoutEffect, useState, Component } from 'react';
-import { compose } from 'redux';
+import React, { useEffect,useLayoutEffect, useState } from 'react';
 import '../../App.css';
 import * as waxjs from "@waxio/waxjs/dist";
-import { sha256, sha224 } from 'js-sha256';
-import { Button, Menu, Row, Col, Divider ,Space, Table, Typography, Layout,Input,Slider,InputNumber} from 'antd';
-import { MailOutlined, AppstoreOutlined, SettingOutlined, LineChartOutlined, StockOutlined, LoginOutlined, AuditOutlined } from '@ant-design/icons';
+import { Button, Menu, Row, Col, Space, Table, Typography, Layout,Input,Slider,InputNumber} from 'antd';
+import { LineChartOutlined, LoginOutlined } from '@ant-design/icons';
 import Icon from '@ant-design/icons';
-
-import { getData } from "./ultils"
-import nftsWaxList from "./nftsList"
-import PropTypes from "prop-types";
+import { getData } from "./ultils";
+import nftsWaxList from "./nftsList";
+import {
+  symbolDefine,
+  columnsOrder,
+  columnsSymbol,
+  columnsTradeHistory,
+  columnsOpenOrder,
+} from "./../../define";
 
 import { scaleTime } from "d3-scale";
-import { utcDay } from "d3-time";
 
 import { ChartCanvas, Chart } from "react-stockcharts";
-import { CandlestickSeries, AreaSeries } from "react-stockcharts/lib/series";
+import { AreaSeries } from "react-stockcharts/lib/series";
 import { XAxis, YAxis } from "react-stockcharts/lib/axes";
 import { curveMonotoneX } from "d3-shape";
-import { fitWidth } from "react-stockcharts/lib/helper";
-import { last, createVerticalLinearGradient, hexToRGBA } from "react-stockcharts/lib/utils";
+import { createVerticalLinearGradient, hexToRGBA } from "react-stockcharts/lib/utils";
 
-import {Link} from "react-router-dom" ;
-import { useLocation, useParams } from 'react-router';
+import {Link, useNavigate} from "react-router-dom" ;
+import { useParams } from 'react-router';
 import axios from 'axios';
 
-function Tradding(props) {
+function Tradding() {
   var wax;
-  // const myChain = {
-  //   chainId: '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4',
-  //   rpcEndpoints: [{
-  //     protocol: 'https',
-  //     host: 'wax.greymass.com',
-  //     port: '443',
-  //   }]
-  // }
+  const navigate = useNavigate();
   const [pubKeys, setPubKeys] = useState('No Public Keys')
-  const location = useLocation();
   const params = useParams();
   const { Title } = Typography;
   const { Header, Content, Footer } = Layout;
   const [size, setSize] = useState([0, 0]);
   const [userAccount, setUserAccount] = useState('');
   
-  const [waxAcc, setWaxAcc] = useState('');
+  const [] = useState('');
   const [balance, setBalance] = useState(null);
   const [balanceSymbol, setBalanceSymbol] = useState([]);
-  const [orderBuy, setOrderBuy] = useState([{
+  const [orderBuy] = useState([{
     key: '1',
     price: 52,
     amount: 1,
@@ -66,7 +58,7 @@ function Tradding(props) {
   const [buyAmount, setBuyAmount] = useState(1);
   const [sellAmount, setSellAmount] = useState(1);
   //----End Form---//
-  const [orderSell, setOrderSell] = useState([{
+  const [orderSell] = useState([{
       key: '1',
       price: 54,
       amount: 1,
@@ -80,108 +72,19 @@ function Tradding(props) {
     },
   ]);
 
-  const [orderCurent, setOrderCurent] = useState(null);
+  const [] = useState(null);
 
   
 
   const [symbolCurent, setSymbolCurent] = useState(nftsWaxList[1]);
   const [pairSymbol, setPairSymbol] = useState('Tlm');
 
-  const [dataSymbol, setDataSymbol] = useState([
-    {
-      key: '1',
-      pair: 'Drill/Wax',
-      price: 52,
-      volume: 100,
-    },
-    {
-      key: '2',
-      pair: 'Drill/TLM',
-      price: 195,
-      volume: 50,
-    },
-  ]);
+  const [dataSymbol] = useState([...nftsWaxList.map(x => {return {pair: x.symbol+'/Wax',price: '-', volume: '-'} }),...nftsWaxList.map(x => {return {pair: x.symbol+'/Tlm',price: '-', volume: '-'} })]);
 
-  const [openOrder, setOpenOrder] = useState([]);
-  const [tradeHistory, setTradeHistory] = useState([]);
+  const [openOrder] = useState([]);
+  const [tradeHistory] = useState([]);
   const [dataChart, setDataChart] = useState([]);
-  const columnsOrder = [
-    {
-      title: 'Price',
-      dataIndex: 'price',
-      key: 'price',
-    },
-    {
-      title: 'Amount',
-      dataIndex: 'amount',
-      key: 'amount',
-      align: 'center',
-    },
-    {
-      title: 'Total',
-      dataIndex: 'total',
-      key: 'total',
-      align: 'right',
-    },
-  ];
-  const columnsSymbol = [
-    {
-      title: 'Pair',
-      dataIndex: 'pair',
-      key: 'pair',
-    },
-    {
-      title: 'Price',
-      dataIndex: 'price',
-      key: 'price',
-      align: 'center',
-    },
-    {
-      title: 'Volume',
-      dataIndex: 'volume',
-      key: 'volume',
-      align: 'right',
-    },
-  ];
-  const columnsTradeHistory = [
-    {
-      title: 'Time',
-      dataIndex: 'time',
-      key: 'time',
-    },
-    {
-      title: 'Pair',
-      dataIndex: 'pair',
-      key: 'pair',
-    },
-    {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
-    },
-    {
-      title: 'Price',
-      dataIndex: 'price',
-      key: 'price',
-    },
-    {
-      title: 'Amount',
-      dataIndex: 'amount',
-      key: 'amount',
-    },
-    {
-      title: 'Total',
-      dataIndex: 'total',
-      key: 'total',
-    },
-  ];
-  const columnsOpenOrder = [...columnsTradeHistory,
-    {
-      title: 'Action',
-      dataIndex: 'action',
-      key: 'action',
-    },
-  ];
+  
 
   const canvasGradient = createVerticalLinearGradient([
     { stop: 0, color: hexToRGBA("#b5d0ff", 0.2) },
@@ -192,39 +95,22 @@ function Tradding(props) {
   // --- Get data wallet ---//
   const getBlance = async (userAccount) => {
     if(userAccount){
-      if(pairSymbol.toUpperCase() == 'TLM'){
         axios({
           method: 'post',
           url: 'https://wax.greymass.com/v1/chain/get_currency_balance',
-          data: JSON.stringify({"code":"alien.worlds","account":userAccount,"symbol":pairSymbol.toUpperCase()})
+          data: JSON.stringify({"code":symbolDefine[pairSymbol].code,"account":userAccount,"symbol":pairSymbol.toUpperCase()})
         }).then(res => {
           if(res.data){
+            console.log(res.data);
             setBalance(parseFloat(res.data[0]));
+            // setBalance(parseFloat(res.data.core_liquid_balance));
           }else{
             setBalance(null);
           }
           
         })
         .catch(error => console.log(error));
-      }else{
-        // eosio.token
-        // https://wax.alcor.exchange/api/markets
-        // https://wax.alcor.exchange/api/account/..../deals?limit=100&skip=0
-
-        axios({
-          method: 'post',
-          url: 'https://wax.greymass.com/v1/chain/get_account',
-          data: JSON.stringify({"account_name":userAccount})
-        }).then(res => {
-          if(res.data){
-            setBalance(parseFloat(res.data.core_liquid_balance));
-          }else{
-            setBalance(null);
-          }
-          
-        })
-        .catch(error => console.log(error));
-      }
+      
     }  
   }
 
@@ -282,24 +168,6 @@ function Tradding(props) {
     getBlance(userAccount);
     getBlanceNfts(userAccount);
   }
-  
-  const fromHexString = (hexString) =>
-  new Uint8Array(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)))
-
-  const getRandomArray = () => {
-    const arr = new Uint8Array(8)
-    for (let i = 0; i < 8; i += 1) {
-      arr[i] = Math.floor(Math.random() * 255)
-    }
-    return arr
-  }
-
-  const toHex = (buffer) => {
-    return Array.from(new Uint8Array(buffer))
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('')
-  }
-
   useLayoutEffect(() => {
       function updateSize() {
         setSize([window.innerWidth, window.innerHeight]);
@@ -318,9 +186,6 @@ function Tradding(props) {
     setPubKeys(pubKeys2);
     getBlance(userAccount2);
     getBlanceNfts(userAccount2);
-  }
-  const settingLogin = () => {
-    login();
   }
   
   async function login(){
@@ -358,7 +223,7 @@ function Tradding(props) {
                         Shine: Stone
                     </Typography.Text>
                     <Typography.Text>
-                        Pair: {symbolCurent.symbol}/Tlm
+                        Pair: {symbolCurent.symbol}/{pairSymbol}
                         <br/>
                         Template Id: {symbolCurent.template_id}
                     </Typography.Text>
@@ -387,10 +252,10 @@ function Tradding(props) {
           <Menu.Item key="logo" style={{ fontSize: '150%'}} >
             ALIENWORLDS MARKET
           </Menu.Item>
-          <Menu.Item key="wallet" icon={<AuditOutlined />}>
+          {/* <Menu.Item key="wallet" icon={<AuditOutlined />}>
             Wallet
-          </Menu.Item>
-          <Menu.SubMenu key="SubMenu" title="Tradding" icon={<LineChartOutlined />}>
+          </Menu.Item> */}
+          <Menu.SubMenu key="SubMenu" title="Tradding Tools" icon={<LineChartOutlined />}>
             <Menu.ItemGroup title="TLM">
                 {
                   nftsWaxList.map((item)=> {
@@ -493,16 +358,22 @@ function Tradding(props) {
               
             </Col>
             <Col xs={6}>
-              <Table dataSource={dataSymbol} columns={columnsSymbol} pagination={false}  scroll={{ y: 500 }} size="small"/>
+              <Table dataSource={dataSymbol} columns={columnsSymbol} pagination={false}  scroll={{ y: 360 }} size="small"
+              onRow={(r) => ({
+                onClick: () => {
+                  navigate('/tradding/'+r.pair);
+                }
+              })}
+              />
             </Col>
           </Row>
           <Row justify="start" gutter={16}>
             <Col xs={{span: 12}}>
                 <Title level={5}>Open orders</Title>
-                <Table dataSource={openOrder} columns={columnsOpenOrder} pagination={false}  scroll={{ y: 500 }}/>
+                <Table dataSource={openOrder} columns={columnsOpenOrder} pagination={false}  scroll={{ y: 220 }}/>
                 <br/>
                 <Title level={5}>Trade history</Title>
-                <Table dataSource={tradeHistory} columns={columnsTradeHistory} pagination={false}  scroll={{ y: 500 }}/>
+                <Table dataSource={tradeHistory} columns={columnsTradeHistory} pagination={false}  scroll={{ y: 220 }}/>
               
             </Col>
             <Col xs={{span: 12}}>
