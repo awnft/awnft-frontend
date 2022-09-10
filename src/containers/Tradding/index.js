@@ -172,6 +172,7 @@ function Tradding() {
     getData().then(data => {
       setDataChart(data)
       console.log(data);
+      
     })
     
   },[]);
@@ -497,22 +498,25 @@ function Tradding() {
       return (
         <Row>
           <Col xs={{span: 24}}>
-            <Row justify="start">
-                <Space size={50}>
-                    
+              <Row justify="start" gutter={16}>
+                  <Col md="6" xs="24" >
                     <img src={symbolCurent.image} style={{maxWidth: '40px'}}/>
-                    
-                    
+                  </Col> 
+                  <Col md="6" xs="24">
                     <Typography.Text>
                         NFT Name: {symbolCurent.name}
                         <br/>
                         Shine: Stone
                     </Typography.Text>
+                  </Col> 
+                  <Col md="6" xs="24"> 
                     <Typography.Text>
                         Pair: {symbolCurent.symbol}/{pairSymbol}
                         <br/>
                         Template Id: {symbolCurent.template_id}
                     </Typography.Text>
+                  </Col>
+                  <Col md="6" xs="24"> 
                     <Typography.Text>
                         Vol: - {symbolCurent.symbol}
                     </Typography.Text>
@@ -521,7 +525,8 @@ function Tradding() {
                         <br/>
                         Height: -
                     </Typography.Text>
-                </Space>
+                  </Col>  
+                    
                 
             </Row>
         </Col>
@@ -600,8 +605,8 @@ function Tradding() {
         </Context.Provider>
           {infomationSymbol()}
           <Row justify="start">
-            <Col xs={6}>
-              <Table dataSource={orderBuy} columns={columnsOrder} pagination={false}  scroll={{ y: 500 }} rowClassName="green" size="small" onRow={(r) => ({
+            <Col xs={24} md={6}>
+              <Table dataSource={orderBuy} columns={columnsOrder} pagination={false}  scroll={{ y: 250 }} rowClassName="green" size="small" onRow={(r) => ({
                   onClick: () => {
                     setSellPrice(r.price);
                     setBuyPrice(r.price);
@@ -610,14 +615,14 @@ function Tradding() {
               <div style={{float: 'left', fontWeight: 'bold', fontSize: '20px', margin: '5px'}}>
                 {curentPrice}
               </div>
-              <Table dataSource={orderSell} columns={columnsOrder} pagination={false} showHeader={false}  scroll={{ y: 500 }} rowClassName="red" size="small" onRow={(r) => ({
+              <Table dataSource={orderSell} columns={columnsOrder} pagination={false} showHeader={false}  scroll={{ y: 250 }} rowClassName="red" size="small" onRow={(r) => ({
                   onClick: () => {
                     setSellPrice(r.price);
                     setBuyPrice(r.price);
                   }
               })}/>
             </Col>
-            <Col xs={12}>
+            <Col xs={0} md={12}>
               {dataChart.length >0 && (
                   <ChartCanvas height={400}
                       ratio={2}
@@ -653,7 +658,7 @@ function Tradding() {
               }
               
             </Col>
-            <Col xs={6}>
+            <Col xs={24} md={6}>
               <Table dataSource={dataSymbol} columns={columnsSymbol} pagination={false}  scroll={{ y: 360 }} size="small"
               onRow={(r) => ({
                 onClick: () => {
@@ -664,7 +669,7 @@ function Tradding() {
             </Col>
           </Row>
           <Row justify="start" gutter={16}>
-            <Col xs={{span: 12}}>
+            <Col xs="24" md={{span: 12}}>
                 <Title level={5}>Open orders</Title>
                 <Table dataSource={openOrder} columns={columnsOpenOrder} pagination={false}  scroll={{ y: 220 }}/>
                 <br/>
@@ -672,9 +677,9 @@ function Tradding() {
                 <Table dataSource={tradeHistory} columns={columnsTradeHistory} pagination={false}  scroll={{ y: 220 }}/>
               
             </Col>
-            <Col xs={{span: 12}}>
+            <Col xs="24" md={{span: 12}}>
               <Row justify="start" gutter={16}>
-                  <Col xs={{span: 12}}>
+                  <Col xs="24" md={{span: 12}}>
                   
                     <Input.Group size="large"></Input.Group>
                     <Space direction="vertical">
@@ -693,7 +698,7 @@ function Tradding() {
                       
                     </Space>
                   </Col>
-                  <Col xs={{span: 12}}>
+                  <Col xs="24" md={{span: 12}}>
                     <Space direction="vertical">
                       <Title level={5}>Sell {symbolCurent.name} | Limit trade</Title>
                       <Typography.Text className="ant-form-text" type="secondary">
