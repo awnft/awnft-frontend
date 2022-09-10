@@ -53,6 +53,7 @@ export const columnsTradeHistory = [
   {
     title: 'Time',
     dataIndex: 'time',
+    sorter: (a, b) => new Date(a.date) - new Date(b.date),
     key: 'time',
   },
   {

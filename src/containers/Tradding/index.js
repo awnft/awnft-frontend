@@ -53,6 +53,7 @@ function Tradding() {
   const [sellPrice, setSellPrice] = useState();
   const [buyAmount, setBuyAmount] = useState(1);
   const [sellAmount, setSellAmount] = useState(1);
+  const [curentPrice, setCurentPrice] = useState();
   //----End Form---//
   const [orderSell, setOrderSell] = useState([]);
 
@@ -76,8 +77,10 @@ function Tradding() {
 
   const [dataSymbol] = useState([...nftsWaxList.map(x => {return {pair: x.symbol+'/Wax',price: '-', volume: '-'} }),...nftsWaxList.map(x => {return {pair: x.symbol+'/Tlm',price: '-', volume: '-'} })]);
 
-  const [openOrder] = useState([]);
-  const [tradeHistory] = useState([]);
+  const [openOrder, setOpenOrder] = useState([]);
+  const [openOrderBuy, setOpenOrderBuy] = useState([]);
+  const [openOrderSell, setOpenOrderSell] = useState([]);
+  const [tradeHistory,setTradeHistory] = useState([]);
   const [dataChart, setDataChart] = useState([]);
   
 
@@ -151,7 +154,10 @@ function Tradding() {
   },[params])
   useEffect(() => { 
     openNotification('topRight');
-  },[noti])
+  },[noti]);
+  useEffect(() => { 
+    setOpenOrder([...openOrderBuy,...openOrderSell])
+  },[openOrderBuy,openOrderSell])
   useEffect(() => { 
     clearData()
   },[symbolCurent,pairSymbol])
@@ -165,6 +171,7 @@ function Tradding() {
     // console.log('started wax:', wax);
     getData().then(data => {
       setDataChart(data)
+      console.log(data);
     })
     
   },[]);
@@ -172,9 +179,11 @@ function Tradding() {
   const clearData = () => {
     setBalance(null);
     setBalanceSymbol([]);
+    setOpenOrder([]);
     getBlance(userAccount);
     getBlanceNfts(userAccount);
     getOrderBook();
+    
   }
   useLayoutEffect(() => {
       function updateSize() {
@@ -188,6 +197,18 @@ function Tradding() {
     createBuyOrder();
     createSellOrder();
     
+    if(orderBuy.length > 0){
+      setCurentPrice(orderBuy[orderBuy.length-1].price);
+      if(!buyPrice){
+        setBuyPrice(orderBuy[orderBuy.length-1].price)
+      }
+    }
+    if(orderSell.length > 0){
+      setCurentPrice(orderSell[0].price)
+      if(!sellPrice){
+        setSellPrice(orderSell[0].price)
+      }
+    }
   }
   async function createBuyOrder(){
     axios({
@@ -208,9 +229,20 @@ function Tradding() {
       })
     }).then(res => {
       if(res.data){
-        
+        const baseOrder = [];
         const baseData = res.data.rows.map(it => {
           var item = it.data;
+          
+          if(item.account == userAccount){
+            baseOrder.push({
+              time: item.timestamp,
+              pair: symbolCurent.symbol +'/'+ item.bid.split(' ')[1],
+              type: 'Buy',
+              price: item.ask/10000,
+              amount: ~~(item.bid.split(' ')[0]/(item.ask/10000)),
+              total: item.bid.split` `[0],
+            });
+          }
           if(item.bid.split(symbolDefine[pairSymbol].symbol).length == 2){
             let total = parseFloat(item.bid.split(symbolDefine[pairSymbol].symbol)).toFixed(symbolDefine[pairSymbol].unit);
             return {
@@ -220,6 +252,7 @@ function Tradding() {
             }
           }
         });
+        setOpenOrderBuy(baseOrder);
         const processBuyOrder = {};
         for(let i=0;i<baseData.length;i++){
           if(!processBuyOrder[baseData[i].price]){
@@ -273,9 +306,19 @@ function Tradding() {
       })
     }).then(res => {
       if(res.data){
-        
+        const baseOrder = [];
         const baseData = res.data.rows.map(it => {
           var item = it.data;
+          if(item.account == userAccount){
+            baseOrder.push({
+              time: item.timestamp,
+              pair: symbolCurent.symbol +'/'+ item.ask.split(' ')[1],
+              type: 'Sell',
+              price: item.ask.split(' ')[0],
+              amount: item.bid.length,
+              total: parseFloat(item.ask.split(' ')[0]*item.bid.length),
+            });
+          }
           if(item.ask.split(symbolDefine[pairSymbol].symbol).length == 2){
             let price = parseFloat(item.ask.split(symbolDefine[pairSymbol].symbol)).toFixed(symbolDefine[pairSymbol].unit);
             return {
@@ -285,6 +328,7 @@ function Tradding() {
             }
           }
         });
+        setOpenOrderSell(baseOrder);
         const processBuyOrder = {};
         for(let i=0;i<baseData.length;i++){
           if(!processBuyOrder[baseData[i].price]){
@@ -412,7 +456,6 @@ function Tradding() {
           }
         )
         .then((result) => {
-          console.log(result)
           setNoti({
             status: 'Success',
             content: 'transaction id: '+result.transaction_id,
@@ -425,8 +468,8 @@ function Tradding() {
         content: error,
       })
     }
-    console.log(actions);
   }
+
   async function login(){
     console.log('Logging in');
    
@@ -565,7 +608,7 @@ function Tradding() {
                   }
                 })}/>
               <div style={{float: 'left', fontWeight: 'bold', fontSize: '20px', margin: '5px'}}>
-                53
+                {curentPrice}
               </div>
               <Table dataSource={orderSell} columns={columnsOrder} pagination={false} showHeader={false}  scroll={{ y: 500 }} rowClassName="red" size="small" onRow={(r) => ({
                   onClick: () => {
