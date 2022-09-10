@@ -1,8 +1,15 @@
 import React, { useEffect,useLayoutEffect, useState } from 'react';
 import '../../App.css';
 import * as waxjs from "@waxio/waxjs/dist";
-import { Button, Menu, Row, Col, Space, Table, Typography, Layout,Input,Slider,InputNumber} from 'antd';
-import { LineChartOutlined, LoginOutlined } from '@ant-design/icons';
+import { Button, Menu, Row, Col, Space, Table, Typography, Layout,Input,Slider,InputNumber, notification} from 'antd';
+import { 
+    LineChartOutlined, 
+    LoginOutlined,
+    RadiusBottomleftOutlined,
+    RadiusBottomrightOutlined,
+    RadiusUpleftOutlined,
+    RadiusUprightOutlined,
+} from '@ant-design/icons';
 import Icon from '@ant-design/icons';
 import { getData } from "./ultils";
 import nftsWaxList from "./nftsList";
@@ -12,8 +19,8 @@ import {
   columnsSymbol,
   columnsTradeHistory,
   columnsOpenOrder,
+  contractName,
 } from "./../../define";
-
 import { scaleTime } from "d3-scale";
 
 import { ChartCanvas, Chart } from "react-stockcharts";
@@ -35,42 +42,30 @@ function Tradding() {
   const { Header, Content, Footer } = Layout;
   const [size, setSize] = useState([0, 0]);
   const [userAccount, setUserAccount] = useState('');
-  
-  const [] = useState('');
+  const [waxJs, setWaxJs] = useState(null);
   const [balance, setBalance] = useState(null);
   const [balanceSymbol, setBalanceSymbol] = useState([]);
-  const [orderBuy] = useState([{
-    key: '1',
-    price: 52,
-    amount: 1,
-    total: 52,
-    },
-    {
-      key: '2',
-      price: 53,
-      amount: 2,
-      total: 106,
-    },
-  ]);
+  const [textToast, contextHolder] = notification.useNotification();
+  const [noti,setNoti] = useState({status:'',content:''});
+  const [orderBuy, setOrderBuy] = useState([]);
   //----Form---//
   const [buyPrice, setBuyPrice] = useState();
   const [sellPrice, setSellPrice] = useState();
   const [buyAmount, setBuyAmount] = useState(1);
   const [sellAmount, setSellAmount] = useState(1);
   //----End Form---//
-  const [orderSell] = useState([{
-      key: '1',
-      price: 54,
-      amount: 1,
-      total: 54,
-    },
-    {
-      key: '2',
-      price: 55,
-      amount: 2,
-      total: 110,
-    },
-  ]);
+  const [orderSell, setOrderSell] = useState([]);
+
+  // Notification
+  const openNotification = (placement) => {
+    if(noti.status){
+      textToast.info({
+        message: `${noti.status}`,
+        description: `${noti.content}`,
+        placement,
+      });
+    }
+  };
 
   const [] = useState(null);
 
@@ -100,8 +95,8 @@ function Tradding() {
           url: 'https://wax.greymass.com/v1/chain/get_currency_balance',
           data: JSON.stringify({"code":symbolDefine[pairSymbol].code,"account":userAccount,"symbol":pairSymbol.toUpperCase()})
         }).then(res => {
-          if(res.data){
-            console.log(res.data);
+          if(res.status === 200){
+            // console.log(res.data);
             setBalance(parseFloat(res.data[0]));
             // setBalance(parseFloat(res.data.core_liquid_balance));
           }else{
@@ -109,14 +104,19 @@ function Tradding() {
           }
           
         })
-        .catch(error => console.log(error));
+        .catch(error => {
+          setNoti({
+            status: 'Error',
+            content: error,
+          })
+        });
       
     }  
   }
 
   const getBlanceNfts = async (userAccount) => {
     if(userAccount){
-      console.log(symbolCurent);
+      // console.log(symbolCurent);
       axios.get(`https://wax.api.atomicassets.io/atomicassets/v1/assets?owner=`+userAccount+`&collection_name=alien.worlds&template_id=`+symbolCurent.template_id+`&limit=1000`)
       .then(res => {
         
@@ -126,7 +126,12 @@ function Tradding() {
           setBalanceSymbol([]);
         }
       })
-      .catch(error => console.log(error));
+      .catch(error => {
+        setNoti({
+          status: 'Error',
+          content: error,
+        })
+      });
     }
     
   }
@@ -137,7 +142,6 @@ function Tradding() {
     if(params.symbol){
         const newSymbol = nftsWaxList.filter((item) => item.symbol == params.symbol);
         setSymbolCurent(newSymbol[0]);
-        console.log(newSymbol[0]);
     }
     if(params.pair){
       setPairSymbol(params.pair);
@@ -146,6 +150,9 @@ function Tradding() {
     
   },[params])
   useEffect(() => { 
+    openNotification('topRight');
+  },[noti])
+  useEffect(() => { 
     clearData()
   },[symbolCurent,pairSymbol])
   useEffect(() => {
@@ -153,7 +160,7 @@ function Tradding() {
     wax = new waxjs.WaxJS({
       rpcEndpoint: 'https://wax.greymass.com'
     });
-    // setWaxAcc(wax);
+    setWaxJs(wax);
     checkAutoLoginAndLogin();
     // console.log('started wax:', wax);
     getData().then(data => {
@@ -167,6 +174,7 @@ function Tradding() {
     setBalanceSymbol([]);
     getBlance(userAccount);
     getBlanceNfts(userAccount);
+    getOrderBook();
   }
   useLayoutEffect(() => {
       function updateSize() {
@@ -176,7 +184,141 @@ function Tradding() {
       updateSize();
       window.removeEventListener('resize', updateSize);
   }, []);
-
+  async function getOrderBook(){
+    createBuyOrder();
+    createSellOrder();
+    
+  }
+  async function createBuyOrder(){
+    axios({
+      method: 'post',
+      url: 'https://wax.greymass.com/v1/chain/get_table_rows',
+      data: JSON.stringify({
+        code: "awmarketmain",
+        index_position: 1,
+        json: true,
+        key_type: "",
+        limit: "10000",
+        lower_bound: null,
+        reverse: false,
+        scope: symbolCurent.scope,
+        show_payer: true,
+        table: "buyorders",
+        upper_bound: null,
+      })
+    }).then(res => {
+      if(res.data){
+        
+        const baseData = res.data.rows.map(it => {
+          var item = it.data;
+          if(item.bid.split(symbolDefine[pairSymbol].symbol).length == 2){
+            let total = parseFloat(item.bid.split(symbolDefine[pairSymbol].symbol)).toFixed(symbolDefine[pairSymbol].unit);
+            return {
+              price: ''+(item.ask/(10**symbolDefine[pairSymbol].unit)),
+              amount: parseInt(total/(item.ask/(10**symbolDefine[pairSymbol].unit))),
+              total: total,
+            }
+          }
+        });
+        const processBuyOrder = {};
+        for(let i=0;i<baseData.length;i++){
+          if(!processBuyOrder[baseData[i].price]){
+            processBuyOrder[baseData[i].price] = {
+              amount: +baseData[i].amount,
+              total: +parseFloat(baseData[i].total).toFixed(4),
+            }
+          }else{
+            processBuyOrder[baseData[i].price].amount += +baseData[i].amount;
+            processBuyOrder[baseData[i].price].total += +parseFloat(baseData[i].total).toFixed(4);
+          }
+        }
+        var orderBuyArray = [];
+        for(let key in processBuyOrder){
+          orderBuyArray.push(
+            {
+              price: +key,
+              amount: processBuyOrder[key].amount,
+              total: processBuyOrder[key].total,
+            }
+          )
+        }
+        if(orderBuyArray.length > 0){
+          setOrderBuy(orderBuyArray.sort((a,b)=> b.price-a.price));
+        }
+      }
+    })
+    .catch(error => {
+      setNoti({
+        status: 'Error',
+        content: error,
+      })
+    });
+  }
+  async function createSellOrder(){
+    axios({
+      method: 'post',
+      url: 'https://wax.greymass.com/v1/chain/get_table_rows',
+      data: JSON.stringify({
+        code: "awmarketmain",
+        index_position: 1,
+        json: true,
+        key_type: "",
+        limit: "10000",
+        lower_bound: null,
+        reverse: false,
+        scope: symbolCurent.scope,
+        show_payer: true,
+        table: "sellorders",
+        upper_bound: null,
+      })
+    }).then(res => {
+      if(res.data){
+        
+        const baseData = res.data.rows.map(it => {
+          var item = it.data;
+          if(item.ask.split(symbolDefine[pairSymbol].symbol).length == 2){
+            let price = parseFloat(item.ask.split(symbolDefine[pairSymbol].symbol)).toFixed(symbolDefine[pairSymbol].unit);
+            return {
+              price: ''+(price),
+              amount: item.bid.length,
+              total: parseFloat(price*item.bid.length).toFixed(symbolDefine[pairSymbol].unit),
+            }
+          }
+        });
+        const processBuyOrder = {};
+        for(let i=0;i<baseData.length;i++){
+          if(!processBuyOrder[baseData[i].price]){
+            processBuyOrder[baseData[i].price] = {
+              amount: +baseData[i].amount,
+              total: +parseFloat(baseData[i].total).toFixed(4),
+            }
+          }else{
+            processBuyOrder[baseData[i].price].amount += +baseData[i].amount;
+            processBuyOrder[baseData[i].price].total += +parseFloat(baseData[i].total).toFixed(4);
+          }
+        }
+        var orderBuyArray = [];
+        for(let key in processBuyOrder){
+          orderBuyArray.push(
+            {
+              price: +key,
+              amount: processBuyOrder[key].amount,
+              total: processBuyOrder[key].total,
+            }
+          )
+        }
+        if(orderBuyArray.length > 0){
+          setOrderSell(orderBuyArray.sort((a,b)=> a.price-b.price));
+        }
+      }
+    })
+    .catch(error => {
+      setNoti({
+        status: 'Error',
+        content: error,
+      })
+    });
+  }
   async function checkAutoLoginAndLogin(){
     var isAutoLoginAwailable = await wax.isAutoLoginAvailable();
     console.log("Auto login", isAutoLoginAwailable);
@@ -187,7 +329,104 @@ function Tradding() {
     getBlance(userAccount2);
     getBlanceNfts(userAccount2);
   }
-  
+  async function buyEvent(){
+    if(!buyPrice){
+      setNoti({
+        status: 'Error',
+        content: 'Price Missing!'
+      })
+      return;
+    }
+    if(!buyAmount){
+      setNoti({
+        status: 'Error',
+        content: 'Amount Missing!'
+      })
+      return;
+    }
+    const actions = [
+      {
+        account: symbolDefine[pairSymbol].code,
+        name: "transfer",
+        authorization: [
+          {
+            actor: userAccount,
+            permission: "active",
+          },
+        ],
+        data: {
+          from: userAccount,
+          to: contractName,
+          quantity: parseFloat(buyPrice*buyAmount).toFixed(symbolDefine[pairSymbol].unit) +' '+symbolDefine[pairSymbol].symbol,
+          memo: 'awnftmarket#'+symbolCurent.scope+'#'+buyPrice*(10**symbolDefine[pairSymbol].unit),
+        }
+      },
+    ];
+    callAction(actions);
+  }
+  async function sellEvent(){
+    if(!sellPrice){
+      setNoti({
+        status: 'Error',
+        content: 'Price Missing!'
+      })
+      return;
+    }
+    if(!sellAmount){
+      setNoti({
+        status: 'Error',
+        content: 'Amount Missing!'
+      })
+      return;
+    }
+    const actions = [
+      {
+        account: "atomicassets",
+        name: "transfer",
+        authorization: [
+          {
+            actor: userAccount,
+            permission: "active",
+          },
+        ],
+        data: {
+          from: userAccount,
+          to: contractName,
+          asset_ids: [...balanceSymbol.slice(0,sellAmount).map(item=>item.asset_id)],
+          memo: 'awnftmarket#'+symbolCurent.scope+'#'+sellPrice*(10**symbolDefine[pairSymbol].unit),
+        }
+      },
+    ];
+    callAction(actions);
+  }
+  async function callAction(actions){
+    try {
+      await waxJs.api
+        .transact(
+          {
+            actions,
+          },
+          {
+            blocksBehind: 3,
+            expireSeconds: 90,
+          }
+        )
+        .then((result) => {
+          console.log(result)
+          setNoti({
+            status: 'Success',
+            content: 'transaction id: '+result.transaction_id,
+          });
+          clearData();
+        })
+    } catch (error){
+      setNoti({
+        status: 'Error',
+        content: error,
+      })
+    }
+    console.log(actions);
+  }
   async function login(){
     console.log('Logging in');
    
@@ -202,9 +441,13 @@ function Tradding() {
       setPubKeys(pubKeys2);
       getBlance(userAccount2);
       getBlanceNfts(userAccount2);
-      
+      setWaxJs(wax);
     } catch (error){
       console.error('User fail to login.', error);
+      setNoti({
+        status: 'Error',
+        content: 'User fail to login.'+ error,
+      })
     }
   }
   const infomationSymbol = ()=> {
@@ -244,6 +487,9 @@ function Tradding() {
       
       )
   }
+  const Context = React.createContext({
+    name: noti.content,
+  });
   return (
     <Layout className="layout">
       <Header>
@@ -302,6 +548,13 @@ function Tradding() {
         
       </Header>
       <Content style={{ padding: '0 50px' }}>
+        <Context.Provider
+          value={{
+            name: 'Notification',
+          }}
+        >
+          {contextHolder}
+        </Context.Provider>
           {infomationSymbol()}
           <Row justify="start">
             <Col xs={6}>
@@ -392,7 +645,7 @@ function Tradding() {
                         <Slider defaultValue={0} marks={{0:'0%', 25: '25%', 50: '50%', 75: '75%', 100: '100%'}} onChange={(v) => setBuyAmount(Math.floor(balance/buyPrice*v/100)) }/>
                         <Input addonBefore="Total"  addonAfter={pairSymbol} defaultValue="" value={sellPrice && buyAmount ? new Intl.NumberFormat().format(buyPrice*buyAmount) : ''} disabled/>
 
-                        <Button style={{ width: "100%" }} onClick={login} type="primary" success>Buy {symbolCurent.name}</Button>
+                        <Button style={{ width: "100%" }} onClick={buyEvent} type="primary" success>Buy {symbolCurent.name}</Button>
                       
                       
                     </Space>
@@ -407,7 +660,7 @@ function Tradding() {
                       <InputNumber min={1} addonBefore="Amount" addonAfter={symbolCurent.symbol}  value={sellAmount} onChange={(v) => setSellAmount(Math.floor(v))} />
                       <Slider defaultValue={0} marks={{0:'0%', 25: '25%', 50: '50%', 75: '75%', 100: '100%'}} onChange={(v) => setSellAmount(Math.floor(balanceSymbol.length*v/100)) }/>
                       <Input addonBefore="Total"  addonAfter={pairSymbol} value={sellPrice && sellAmount ? new Intl.NumberFormat().format(sellPrice*sellAmount) : ''} disabled/>
-                      <Button style={{ width: "100%" }} onClick={login} type="primary" danger>Sell {symbolCurent.name}</Button>
+                      <Button style={{ width: "100%" }} onClick={sellEvent} type="primary" danger>Sell {symbolCurent.name}</Button>
                     </Space>
                   </Col>
               </Row>

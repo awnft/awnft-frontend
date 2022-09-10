@@ -10,6 +10,7 @@ export const symbolDefine = {
       unit: 8,
   }
 };
+export const contractName = 'awmarketmain';
 export const columnsOrder = [
   {
     title: 'Price',

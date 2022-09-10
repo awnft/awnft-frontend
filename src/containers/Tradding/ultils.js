@@ -13,12 +13,28 @@ function parseData(parse) {
 		return d;
 	};
 }
+function parseData2(parse) {
+	return function(d) {
+		d.date = parse(d.time);
+		d.open = +d.open;
+		d.high = +d.high;
+		d.low = +d.low;
+		d.close = +d.close;
+		d.volume = +d.volume;
 
+		return d;
+	};
+}
 const parseDate = timeParse("%Y-%m-%d");
 
 export function getData() {
 	const promiseMSFT = fetch("https://cdn.rawgit.com/rrag/react-stockcharts/master/docs/data/MSFT.tsv")
 		.then(response => response.text())
 		.then(data => tsvParse(data, parseData(parseDate)))
+	// const getChart = fetch("https://wax.alcor.exchange/api/markets/26/charts?resolution=240")
+	// 	.then(response => JSON.parse(response.json()))
+	// 	.then(data => tsvParse(data, parseData2(parseDate)))
+	// console.log(getChart)
+	// console.log(promiseMSFT)
 	return promiseMSFT;
 }

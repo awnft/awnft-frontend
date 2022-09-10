@@ -21,87 +21,104 @@ const list = [
 		{
 			name: 'Standard Shovel',
 			symbol: 'StandardShovel',
-			image: StandardShovel
+			image: StandardShovel,
+			scope: 0,
 		},
 		{
 			name: 'Standard Drill',
 			symbol: 'StandardDrill',
-			image: StandardDrill
+			image: StandardDrill,
+			scope: 1,
 		},
 		{
 			name: 'Standard Capacitor',
 			symbol: 'StandardCapacitor',
-			image: StandardCapacitor
+			image: StandardCapacitor,
+			scope: 2,
 		},
 		{
 			name: 'RD9000 Excavator',
 			symbol: 'RD9000Excavator',
-			image: RD9000Excavator
+			image: RD9000Excavator,
+			scope: 0,
 		},
 		{
 			name: 'Quark Separator',
 			symbol: 'QuarkSeparator',
-			image: QuarkSeparator
+			image: QuarkSeparator,
+			scope: 0,
 		},
 		{
 			name: 'Processing Ring',
 			symbol: 'ProcessingRing',
-			image: ProcessingRing
+			image: ProcessingRing,
+			scope: 0,
 		},
 		{
 			name: 'Power Extractor',
 			symbol: 'PowerExtractor',
-			image: PowerExtractor
+			image: PowerExtractor,
+			scope: 0,
 		},
 		{
 			name: 'Large Explosive',
 			symbol: 'LargeExplosive',
-			image: LargeExplosive
+			image: LargeExplosive,
+			scope: 0,
 		},
 		{
 			name: 'Large Capacitor',
 			symbol: 'LargeCapacitor',
-			image: LargeCapacitor
+			image: LargeCapacitor,
+			scope: 0,
 		},
 		{
 			name: 'Infused Extractor',
 			symbol: 'InfusedExtractor',
-			image: InfusedExtractor
+			image: InfusedExtractor,
+			scope: 0,
 		},
 		{
 			name: 'Glavor Disc',
 			symbol: 'GlavorDisc',
-			image: GlavorDisc
+			image: GlavorDisc,
+			scope: 0,
 		},
 		{
 			name: 'Gasrigged Extractor',
 			symbol: 'GasriggedExtractor',
-			image: GasriggedExtractor
+			image: GasriggedExtractor,
+			scope: 0,
 		},
 		{
 			name: 'Draxos Axe',
 			symbol: 'DraxosAxe',
-			image: DraxosAxe
+			image: DraxosAxe,
+			scope: 0,
 		},
 		{
 			name: 'Causian Attractor',
 			symbol: 'CausianAttractor',
-			image: CausianAttractor
+			image: CausianAttractor,
+			scope: 0,
 		},
 		{
 			name: 'Basic Trilium Detector',
 			symbol: 'BasicTriliumDetector',
-			image: BasicTriliumDetector
+			image: BasicTriliumDetector,
+			scope: 0,
 		},
 		{
 			name: 'Barrel Digger',
 			symbol: 'BarrelDigger',
-			image: BarrelDigger
+			image: BarrelDigger,
+			scope: 0,
 		},
 		{
 			name: 'Artunian Shovel',
 			symbol: 'ArtunianShovel',
-			image: ArtunianShovel
+			image: ArtunianShovel,
+			scope: 0,
 		},
 	];
 

@@ -23,12 +23,14 @@ const list = [
 			symbol: 'StandardShovel',
 			image: StandardShovel,
 			template_id: 19552,
+			scope: 0,
 		},
 		{
 			name: 'Standard Drill',
 			symbol: 'StandardDrill',
 			image: StandardDrill,
 			template_id: 19553,
+			scope: 1,
 		},
 		{
 			name: 'Standard Capacitor',
