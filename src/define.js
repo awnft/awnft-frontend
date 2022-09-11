@@ -1,5 +1,5 @@
 export const symbolDefine = {
-  Tlm: {
+  TLM: {
       code: 'alien.worlds',
       symbol: 'TLM',
       unit: 4,
