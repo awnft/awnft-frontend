@@ -1,7 +1,7 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import '../../App.css';
 import * as waxjs from "@waxio/waxjs/dist";
-import { Button, Menu, Row, Col, Space, Table, Typography, Layout, Input, Slider, InputNumber, notification } from 'antd';
+import { Spin, Button, Menu, Row, Col, Space, Table, Typography, Layout, Input, Slider, InputNumber, notification } from 'antd';
 import {
   LineChartOutlined,
   LoginOutlined,
@@ -50,6 +50,7 @@ function Tradding() {
   const [noti, setNoti] = useState({ status: '', content: '' });
   const [orderBuy, setOrderBuy] = useState([]);
   //----Form---//
+  const [loading, setLoading] = useState(false);
   const [buyPrice, setBuyPrice] = useState();
   const [sellPrice, setSellPrice] = useState();
   const [buyAmount, setBuyAmount] = useState(1);
@@ -120,12 +121,14 @@ function Tradding() {
 
   const getBlanceNfts = async (userAccount) => {
     if (userAccount) {
+      setLoading(true);
       // console.log(symbolCurent);
       axios.get(`https://wax.api.atomicassets.io/atomicassets/v1/assets?owner=` + userAccount + `&collection_name=alien.worlds&template_id=` + symbolCurent.template_id + `&limit=1000`)
         .then(res => {
 
           if (res.data) {
             setBalanceSymbol([...res.data.data])
+            setLoading(false);
           } else {
             setBalanceSymbol([]);
           }
@@ -744,17 +747,23 @@ function Tradding() {
                 </Space>
               </Col>
               <Col xs="24" md={{ span: 12 }}>
+              <Spin spinning={loading}>
                 <Space direction="vertical">
                   <Title level={5}>Sell {symbolCurent.name} | Limit trade</Title>
-                  <Typography.Text className="ant-form-text" type="secondary">
-                    Balance: {new Intl.NumberFormat().format(balanceSymbol.length)} {symbolCurent.name}
-                  </Typography.Text>
-                  <Input addonBefore="Price" addonAfter={pairSymbol} defaultValue="" value={sellPrice} onChange={(v) => setSellPrice(v.target.value)} />
-                  <InputNumber min={1} addonBefore="Amount" addonAfter={symbolCurent.symbol} value={sellAmount} onChange={(v) => setSellAmount(Math.floor(v))} />
-                  <Slider defaultValue={0} marks={{ 0: '0%', 25: '25%', 50: '50%', 75: '75%', 100: '100%' }} onChange={(v) => setSellAmount(Math.floor(balanceSymbol.length * v / 100))} />
-                  <Input addonBefore="Total" addonAfter={pairSymbol} value={sellPrice && sellAmount ? new Intl.NumberFormat().format(sellPrice * sellAmount) : ''} disabled />
-                  <Button style={{ width: "100%" }} onClick={sellEvent} type="primary" danger>Sell {symbolCurent.name}</Button>
+                  
+                    <Typography.Text className="ant-form-text" type="secondary">
+                      Balance:  {balanceSymbol.length >= 1000 ? '>=' : ''}{Intl.NumberFormat().format(balanceSymbol.length)} {symbolCurent.name}
+                      
+                    </Typography.Text>
+                    <Input addonBefore="Price" addonAfter={pairSymbol} defaultValue="" value={sellPrice} onChange={(v) => setSellPrice(v.target.value)} />
+                    <InputNumber min={1} addonBefore="Amount" addonAfter={symbolCurent.symbol} value={sellAmount} onChange={(v) => setSellAmount(Math.floor(v))} />
+                    <Slider defaultValue={0} marks={{ 0: '0%', 25: '25%', 50: '50%', 75: '75%', 100: '100%' }} onChange={(v) => setSellAmount(Math.floor(balanceSymbol.length * v / 100))} />
+                    <Input addonBefore="Total" addonAfter={pairSymbol} value={sellPrice && sellAmount ? new Intl.NumberFormat().format(sellPrice * sellAmount) : ''} disabled />
+                    <Button style={{ width: "100%" }} onClick={sellEvent} type="primary" danger>Sell {symbolCurent.name}</Button>
+                 
+                  
                 </Space>
+              </Spin>
               </Col>
             </Row>
           </Col>
