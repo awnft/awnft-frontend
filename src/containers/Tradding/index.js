@@ -9,6 +9,7 @@ import {
   RadiusBottomrightOutlined,
   RadiusUpleftOutlined,
   RadiusUprightOutlined,
+  CloseOutlined,
 } from '@ant-design/icons';
 import Icon from '@ant-design/icons';
 import { getData } from "./ultils";
@@ -170,7 +171,6 @@ function Tradding() {
     // console.log('started wax:', wax);
     getData().then(data => {
       setDataChart(data)
-      console.log(data);
 
     })
 
@@ -180,6 +180,10 @@ function Tradding() {
     setBalance(null);
     setBalanceSymbol([]);
     setOpenOrder([]);
+    setOpenOrderBuy([]);
+    setOpenOrderSell([]);
+    setOrderBuy([]);
+    setOrderSell([]);
     getBlance(userAccount);
     getBlanceNfts(userAccount);
     getOrderBook();
@@ -232,9 +236,9 @@ function Tradding() {
         const baseOrder = [];
         const baseData = res.data.rows.map(it => {
           var item = it.data;
-
           if (item.account == userAccount) {
             baseOrder.push({
+              id: item.id,
               time: item.timestamp,
               pair: symbolCurent.symbol + '/' + item.bid.split(' ')[1],
               type: 'Buy',
@@ -312,6 +316,7 @@ function Tradding() {
           var item = it.data;
           if (item.account == userAccount) {
             baseOrder.push({
+              id: item.id,
               time: item.timestamp,
               pair: symbolCurent.symbol + '/' + item.ask.split(' ')[1],
               type: 'Sell',
@@ -482,7 +487,26 @@ function Tradding() {
       })
     }
   }
-
+  async function cancelOrder(id,type){
+    const actions = [
+      {
+        account: "awmarketmain",
+        name: type =='Buy'? "cancelbuy" : "cancelsell",
+        authorization: [
+          {
+            actor: userAccount,
+            permission: "active",
+          },
+        ],
+        data: {
+          executor: userAccount,
+          market_id: symbolCurent.scope,
+          order_id: id,
+        }
+      },
+    ];
+    callAction(actions);
+  }
   async function login() {
     console.log('Logging in');
 
@@ -683,7 +707,16 @@ function Tradding() {
         <Row justify="start" gutter={16}>
           <Col xs="24" md={{ span: 12 }}>
             <Title level={5}>Open orders</Title>
-            <Table dataSource={openOrder} columns={columnsOpenOrder} pagination={false} scroll={{ y: 220 }} />
+            <Table dataSource={openOrder} columns={[...columnsTradeHistory,{
+                title: 'Action',
+                dataIndex: 'action',
+                align: 'center',
+                render: (_, record) => (
+                  <Space size="middle">
+                    <CloseOutlined onClick={() => cancelOrder(record.id,record.type)} />
+                  </Space>
+                ),
+            }]} pagination={false} scroll={{ y: 220 }} />
             <br />
             <Title level={5}>Trade history</Title>
             <Table dataSource={tradeHistory} columns={columnsTradeHistory} pagination={false} scroll={{ y: 220 }} />
