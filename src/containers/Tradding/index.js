@@ -238,16 +238,17 @@ function Tradding() {
               time: item.timestamp,
               pair: symbolCurent.symbol + '/' + item.bid.split(' ')[1],
               type: 'Buy',
-              price: item.ask / 10000,
-              amount: ~~(item.bid.split(' ')[0] / (item.ask / 10000)),
-              total: item.bid.split` `[0],
+              price: parseFloat(item.bid.split(' ')[0]/item.ask).toFixed(4),
+              amount: ~~(item.ask),
+              total: parseFloat(item.bid.split(' ')[0]).toFixed(4),
             });
           }
           if (item.bid.split(symbolDefine[pairSymbol].symbol).length == 2) {
-            let total = parseFloat(item.bid.split(symbolDefine[pairSymbol].symbol)).toFixed(symbolDefine[pairSymbol].unit);
+            
+            let total = parseFloat(item.bid.split(symbolDefine[pairSymbol].symbol)[0]).toFixed(symbolDefine[pairSymbol].unit);
             return {
-              price: '' + (item.ask / (10 ** symbolDefine[pairSymbol].unit)),
-              amount: parseInt(total / (item.ask / (10 ** symbolDefine[pairSymbol].unit))),
+              price: '' + parseFloat(total/item.ask).toFixed(symbolDefine[pairSymbol].unit),
+              amount: item.ask,
               total: total,
             }
           }
@@ -262,7 +263,7 @@ function Tradding() {
             }
           } else {
             processBuyOrder[baseData[i].price].amount += +baseData[i].amount;
-            processBuyOrder[baseData[i].price].total += +parseFloat(baseData[i].total).toFixed(4);
+            processBuyOrder[baseData[i].price].total += +parseFloat(baseData[i].total).toFixed(symbolDefine[pairSymbol].unit);
           }
         }
         var orderBuyArray = [];
@@ -276,7 +277,7 @@ function Tradding() {
           )
         }
         if (orderBuyArray.length > 0) {
-          setOrderBuy(orderBuyArray.sort((a, b) => b.price - a.price));
+          setOrderBuy(orderBuyArray.sort((a, b) => a.price - b.price));
         }
       }
     })
@@ -314,17 +315,18 @@ function Tradding() {
               time: item.timestamp,
               pair: symbolCurent.symbol + '/' + item.ask.split(' ')[1],
               type: 'Sell',
-              price: item.ask.split(' ')[0],
+              price: item.ask.split(' ')[0]/item.bid.length,
               amount: item.bid.length,
-              total: parseFloat(item.ask.split(' ')[0] * item.bid.length),
+              total: parseFloat(item.ask.split(' ')[0]),
             });
           }
           if (item.ask.split(symbolDefine[pairSymbol].symbol).length == 2) {
-            let price = parseFloat(item.ask.split(symbolDefine[pairSymbol].symbol)).toFixed(symbolDefine[pairSymbol].unit);
+            
+            let price = parseFloat(item.ask.split(symbolDefine[pairSymbol].symbol)[0]/item.bid.length).toFixed(symbolDefine[pairSymbol].unit);
             return {
               price: '' + (price),
               amount: item.bid.length,
-              total: parseFloat(price * item.bid.length).toFixed(symbolDefine[pairSymbol].unit),
+              total: parseFloat(item.ask.split(symbolDefine[pairSymbol].symbol)[0]).toFixed(symbolDefine[pairSymbol].unit),
             }
           }
         });
@@ -409,7 +411,7 @@ function Tradding() {
           from: userAccount,
           to: contractName,
           quantity: parseFloat(buyPrice * buyAmount).toFixed(symbolDefine[pairSymbol].unit) + ' ' + symbolDefine[pairSymbol].symbol,
-          memo: 'awnftmarket#' + symbolCurent.scope + '#' + buyPrice * (10 ** symbolDefine[pairSymbol].unit),
+          memo: 'awnftmarket#' + symbolCurent.scope + '#' + buyAmount,
         }
       },
     ];
@@ -444,7 +446,7 @@ function Tradding() {
           from: userAccount,
           to: contractName,
           asset_ids: [...balanceSymbol.slice(0, sellAmount).map(item => item.asset_id)],
-          memo: 'awnftmarket#' + symbolCurent.scope + '#' + sellPrice * (10 ** symbolDefine[pairSymbol].unit),
+          memo: 'awnftmarket#' + symbolCurent.scope + '#' + (sellPrice*sellAmount) * (10 ** symbolDefine[pairSymbol].unit),
         }
       },
     ];
