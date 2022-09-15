@@ -12,7 +12,6 @@ import {
   CloseOutlined,
 } from '@ant-design/icons';
 import Icon from '@ant-design/icons';
-import { getData } from "./ultils";
 import nftsWaxList from "./nftsList";
 import {
   symbolDefine,
@@ -22,18 +21,11 @@ import {
   columnsOpenOrder,
   contractName,
 } from "./../../define";
-import { scaleTime } from "d3-scale";
-
-import { ChartCanvas, Chart } from "react-stockcharts";
-import { AreaSeries } from "react-stockcharts/lib/series";
-import { XAxis, YAxis } from "react-stockcharts/lib/axes";
-import { curveMonotoneX } from "d3-shape";
-import { createVerticalLinearGradient, hexToRGBA } from "react-stockcharts/lib/utils";
 
 import { Link, useNavigate } from "react-router-dom";
 import { useParams } from 'react-router';
 import axios from 'axios';
-
+import ChartData from '../../components/Chart/ChartData';
 function Tradding() {
   var wax;
   const navigate = useNavigate();
@@ -41,11 +33,12 @@ function Tradding() {
   const params = useParams();
   const { Title } = Typography;
   const { Header, Content, Footer } = Layout;
-  const [size, setSize] = useState([0, 0]);
+  
   const [userAccount, setUserAccount] = useState('');
   const [waxJs, setWaxJs] = useState(null);
   const [balance, setBalance] = useState(null);
   const [balanceSymbol, setBalanceSymbol] = useState([]);
+  const [market,setMarket] = useState([]);
   const [textToast, contextHolder] = notification.useNotification();
   const [noti, setNoti] = useState({ status: '', content: '' });
   const [orderBuy, setOrderBuy] = useState([]);
@@ -83,14 +76,9 @@ function Tradding() {
   const [openOrderBuy, setOpenOrderBuy] = useState([]);
   const [openOrderSell, setOpenOrderSell] = useState([]);
   const [tradeHistory, setTradeHistory] = useState([]);
-  const [dataChart, setDataChart] = useState([]);
 
 
-  const canvasGradient = createVerticalLinearGradient([
-    { stop: 0, color: hexToRGBA("#b5d0ff", 0.2) },
-    { stop: 0.7, color: hexToRGBA("#6fa4fc", 0.4) },
-    { stop: 1, color: hexToRGBA("#4286f4", 0.8) },
-  ]);
+  
 
   // --- Get data wallet ---//
   const getBlance = async (userAccount) => {
@@ -135,25 +123,25 @@ function Tradding() {
         })
         .catch(error => {
           setNoti({
-            status: 'Error',
+            status: 'Nfts loading Error',
             content: error,
           })
+          
         });
     }
 
   }
 
-  // -- End get dât wallet
+  // -- End get wallet data
   useEffect(() => {
     if (params.symbol) {
       const newSymbol = nftsWaxList.filter((item) => item.symbol == params.symbol);
       setSymbolCurent(newSymbol[0]);
+
     }
     if (params.pair) {
       setPairSymbol(params.pair);
     }
-
-
   }, [params])
   useEffect(() => {
     openNotification('topRight');
@@ -162,7 +150,10 @@ function Tradding() {
     setOpenOrder([...openOrderBuy, ...openOrderSell])
   }, [openOrderBuy, openOrderSell])
   useEffect(() => {
-    clearData()
+    setTimeout(function(){
+      clearData();
+    },200)
+    getMarketData();
   }, [symbolCurent, pairSymbol])
   useEffect(() => {
     //wax = new waxjs.WaxJS('https://wax.greymass.com', null, null, false);
@@ -171,12 +162,7 @@ function Tradding() {
     });
     setWaxJs(wax);
     checkAutoLoginAndLogin();
-    // console.log('started wax:', wax);
-    getData().then(data => {
-      setDataChart(data)
-
-    })
-
+    
   }, []);
 
   const clearData = () => {
@@ -190,16 +176,50 @@ function Tradding() {
     getBlance(userAccount);
     getBlanceNfts(userAccount);
     getOrderBook();
-
+    
   }
-  useLayoutEffect(() => {
-    function updateSize() {
-      setSize([window.innerWidth, window.innerHeight]);
-    }
-    window.addEventListener('resize', updateSize);
-    updateSize();
-    window.removeEventListener('resize', updateSize);
-  }, []);
+  async function getMarketData() { 
+    axios({
+      method: 'post',
+      url: 'https://api.cleancodevietnam.com/wax/api/v0/search',
+      data: JSON.stringify({
+        "mk_id": 0,
+        "asker": "jyora.wam",
+        "bidder": "jyora.wam",
+        "base_token_sym": "4,TLM",
+        "base_token_id": 0,
+        "from": 1662992500,
+        "to": 1662992800
+      })
+    }).then(res => {
+      if(res.data){
+        let newData = [...res.data].map(item => {
+          if(item.type == 'buymatch'){
+            return {
+              date: item.timestamp,
+              open: item.bid[0].split` `[0]/item.ask.length,
+              high: item.bid[0].split` `[0]/item.ask.length,
+		          low: item.bid[0].split` `[0]/item.ask.length,
+              close: item.bid[0].split` `[0]/item.ask.length,
+              volume: item.ask.length,
+            }
+          }else{
+            return {
+              date: item.timestamp,
+              open: item.ask[0].split` `[0]/item.bid.length,
+              high: item.ask[0].split` `[0]/item.bid.length,
+		          low: item.ask[0].split` `[0]/item.bid.length,
+              close: item.ask[0].split` `[0]/item.bid.length,
+              volume: item.bid.length,
+            }
+          }
+        });
+        setMarket(newData);
+      }
+       
+      console.log(res);
+    })
+  }
   async function getOrderBook() {
     createBuyOrder();
     createSellOrder();
@@ -383,9 +403,9 @@ function Tradding() {
     var isAutoLoginAwailable = await wax.isAutoLoginAvailable();
     console.log("Auto login", isAutoLoginAwailable);
     var userAccount2 = wax.userAccount
-    var pubKeys2 = wax.pubKeys
     setUserAccount(userAccount2);
-    setPubKeys(pubKeys2);
+    // var pubKeys2 = wax.pubKeys
+    // setPubKeys(pubKeys2);
     getBlance(userAccount2);
     getBlanceNfts(userAccount2);
     return isAutoLoginAwailable;
@@ -481,7 +501,10 @@ function Tradding() {
             status: 'Success',
             content: 'transaction id: ' + result.transaction_id,
           });
-          clearData();
+          setTimeout(function(){
+            clearData();
+          },2000)
+          
         })
     } catch (error) {
       setNoti({
@@ -577,61 +600,45 @@ function Tradding() {
   const Context = React.createContext({
     name: noti.content,
   });
+  const menuItems = [
+    {
+      key: 'logo',
+      label: 'ALIENWORLDS MARKET',
+      className: 'fontsize150',
+    },
+    {
+      key: 'SubMenu',
+      label: "Tradding Tools",
+      icon: <LineChartOutlined />,
+      children: nftsWaxList.map((item) => {
+        return {
+          key: item.symbol + 'TLM',
+          label: (
+            <span style={{ display: 'table-cell', verticalAlign: 'top' }}>
+              <Link to={`/tradding/` + item.symbol + '/TLM'}>{item.name}/TLM</Link>
+            </span>
+          ),
+          icon: <Icon component={() => (<img className="ant-menu-item" src={item.image} />)} />,
+        }
+      })
+    },
+    {
+      key: 'info',
+      label: userAccount ? (
+        userAccount
+      ) :
+      (
+        <Button onClick={()=>login()}>Login</Button>
+      ),
+      icon: <LoginOutlined />,
+    }
+  ]
+  
   return (
     <Layout className="layout">
       <Header>
         <div className="logo" />
-        <Menu theme="light" mode="horizontal" defaultSelectedKeys={['mail']}>
-          <Menu.Item key="logo" style={{ fontSize: '150%' }} >
-            ALIENWORLDS MARKET
-          </Menu.Item>
-          {/* <Menu.Item key="wallet" icon={<AuditOutlined />}>
-            Wallet
-          </Menu.Item> */}
-          <Menu.SubMenu key="SubMenu" title="Tradding Tools" icon={<LineChartOutlined />}>
-            <Menu.ItemGroup title="TLM">
-              {
-                nftsWaxList.map((item) => {
-                  return (
-                    <Menu.Item style={{ display: 'table' }} key={item.symbol + 'TLM'} icon={<Icon component={() => (<img className="ant-menu-item" src={item.image} />)} />}>
-                      <span style={{ display: 'table-cell', verticalAlign: 'top' }}>
-                        <Link to={`/tradding/` + item.symbol + '/TLM'}>{item.name}/TLM</Link>
-                      </span>
-                    </Menu.Item>
-                  )
-                })
-              }
-
-
-            </Menu.ItemGroup>
-            {/* <Menu.ItemGroup title="WAX">
-              {
-                nftsWaxList.map((item) => {
-                  return (
-                    <Menu.Item style={{ display: 'table' }} key={item.symbol + 'wax'} icon={<Icon component={() => (<img className="ant-menu-item" src={item.image} />)} />} >
-                      <span style={{ display: 'table-cell', verticalAlign: 'top' }}>
-                        <Link to={`/tradding/` + item.symbol + '/Wax'}>{item.name}/Wax</Link>
-                      </span>
-
-                    </Menu.Item>
-                  )
-                })
-              }
-            </Menu.ItemGroup> */}
-          </Menu.SubMenu>
-          {userAccount && (
-            <Menu.Item key="info" icon={<LoginOutlined />}>
-              {userAccount}
-            </Menu.Item>
-          )
-          }
-          {!userAccount && (
-            <Menu.Item key="login" icon={<LoginOutlined />}>
-              <Button onClick={login}>Login</Button>
-            </Menu.Item>
-          )
-          }
-        </Menu>
+        <Menu theme="light" mode="horizontal" defaultSelectedKeys={['mail']} items={menuItems} />
 
       </Header>
       <Content style={{ padding: '0 50px' }}>
@@ -662,39 +669,7 @@ function Tradding() {
             })} />
           </Col>
           <Col xs={0} md={12}>
-            {dataChart.length > 0 && (
-              <ChartCanvas height={400}
-                ratio={2}
-                width={size[0] * 0.5 - 25}
-                margin={{ left: 50, right: 50, top: 10, bottom: 30 }}
-                seriesName="MSFT"
-                data={dataChart}
-                xAccessor={d => d.date}
-                xScale={scaleTime()}
-                xExtents={[new Date(2011, 0, 1), new Date()]}
-              >
-
-                <Chart id={0} yExtents={[d => [d.high, d.low]]}>
-                  <defs>
-                    <linearGradient id="MyGradient" x1="0" y1="100%" x2="0" y2="0%">
-                      <stop offset="0%" stopColor="#b5d0ff" stopOpacity={0.2} />
-                      <stop offset="70%" stopColor="#6fa4fc" stopOpacity={0.4} />
-                      <stop offset="100%" stopColor="#4286f4" stopOpacity={0.8} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis axisAt="bottom" orient="bottom" ticks={6} />
-                  <YAxis axisAt="left" orient="left" />
-                  <AreaSeries
-                    yAccessor={d => d.close}
-                    fill="url(#MyGradient)"
-                    strokeWidth={2}
-                    interpolation={curveMonotoneX}
-                    canvasGradient={canvasGradient}
-                  />
-                </Chart>
-              </ChartCanvas>
-            )
-            }
+              <ChartData />
 
           </Col>
           <Col xs={24} md={6}>

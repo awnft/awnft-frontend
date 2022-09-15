@@ -7,7 +7,6 @@ import {
   useRoutes,
 } from "react-router-dom";
 import Tradding from './containers/Tradding/index';
-import Home from './containers/Home/index';
 const App = () => {
   let routes = useRoutes([
     { path: "/", element: <Tradding /> },
