@@ -32,20 +32,27 @@ export const columnsOrder = [
 ];
 export const columnsSymbol = [
   {
-    title: 'Pair',
-    dataIndex: 'pair',
-    key: 'pair',
+    title: 'type',
+    dataIndex: 'type',
+    key: 'type',
+    align: 'left',
   },
   {
     title: 'Price',
     dataIndex: 'price',
     key: 'price',
+    align: 'left',
+  },
+  {
+    title: 'Amount',
+    dataIndex: 'amount',
+    key: 'amount',
     align: 'center',
   },
   {
-    title: 'Volume',
-    dataIndex: 'volume',
-    key: 'volume',
+    title: 'Time',
+    dataIndex: 'time',
+    key: 'time',
     align: 'right',
   },
 ];

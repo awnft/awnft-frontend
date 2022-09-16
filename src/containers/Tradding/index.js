@@ -26,9 +26,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { useParams } from 'react-router';
 import axios from 'axios';
 import ChartData from '../../components/Chart/ChartData';
+import { timeParse } from "d3-time-format";
+
 function Tradding() {
   var wax;
   const navigate = useNavigate();
+  const parseDateTime = timeParse("%Y-%m-%d %H:%M:%S");
+
   const [pubKeys, setPubKeys] = useState('No Public Keys')
   const params = useParams();
   const { Title } = Typography;
@@ -51,6 +55,12 @@ function Tradding() {
   const [curentPrice, setCurentPrice] = useState();
   //----End Form---//
   const [orderSell, setOrderSell] = useState([]);
+
+  // Info pair
+  const [priceHighest, setPriceHighest] = useState(0);
+  const [priceLowest, setPriceLowest] = useState(999999);
+  const [volumeDay, setVolumeDay] = useState(0);
+  const [volumePriceDay, setVolumePriceDay] = useState(0);
 
   // Notification
   const openNotification = (placement) => {
@@ -76,7 +86,7 @@ function Tradding() {
   const [openOrderBuy, setOpenOrderBuy] = useState([]);
   const [openOrderSell, setOpenOrderSell] = useState([]);
   const [tradeHistory, setTradeHistory] = useState([]);
-
+  const [dataMarket, setDataMarket] = useState([]);
 
   
 
@@ -150,10 +160,11 @@ function Tradding() {
     setOpenOrder([...openOrderBuy, ...openOrderSell])
   }, [openOrderBuy, openOrderSell])
   useEffect(() => {
+    getMarketData();
     setTimeout(function(){
       clearData();
     },200)
-    getMarketData();
+    
   }, [symbolCurent, pairSymbol])
   useEffect(() => {
     //wax = new waxjs.WaxJS('https://wax.greymass.com', null, null, false);
@@ -182,42 +193,110 @@ function Tradding() {
     axios({
       method: 'post',
       url: 'https://api.cleancodevietnam.com/wax/api/v0/search',
-      data: JSON.stringify({
-        "mk_id": 0,
-        "asker": "jyora.wam",
-        "bidder": "jyora.wam",
-        "base_token_sym": "4,TLM",
-        "base_token_id": 0,
-        "from": 1662992500,
-        "to": 1662992800
-      })
+      data: {
+        "mk_id": symbolCurent.scope,
+        "base_token_sym": symbolDefine[pairSymbol].unit+','+symbolDefine[pairSymbol].symbol,
+        "base_token_id": symbolCurent.scope,
+      }
     }).then(res => {
       if(res.data){
         let newData = [...res.data].map(item => {
           if(item.type == 'buymatch'){
             return {
-              date: item.timestamp,
-              open: item.bid[0].split` `[0]/item.ask.length,
-              high: item.bid[0].split` `[0]/item.ask.length,
-		          low: item.bid[0].split` `[0]/item.ask.length,
-              close: item.bid[0].split` `[0]/item.ask.length,
-              volume: item.ask.length,
+              x: new Date(item.timestamp * 1000),
+              y: item.bid[0].split` `[0]/item.ask.length,
+              z: item.ask.length
             }
           }else{
             return {
-              date: item.timestamp,
-              open: item.ask[0].split` `[0]/item.bid.length,
-              high: item.ask[0].split` `[0]/item.bid.length,
-		          low: item.ask[0].split` `[0]/item.bid.length,
-              close: item.ask[0].split` `[0]/item.bid.length,
-              volume: item.bid.length,
+              x: new Date(item.timestamp * 1000),
+              y: item.ask[0].split` `[0]/item.bid.length,
+              z: item.bid.length
             }
           }
         });
-        setMarket(newData);
+        setMarket([...newData]);
+        var today = new Date();
+        var volumeToday = 0;
+        var volumePriceToday = 0;
+        var highest = priceHighest;
+        var lowest = priceLowest;
+        let newMarket = [...res.data].map(item => {
+          var time = new Date(item.timestamp * 1000);
+          if(time  > today - 1000*60*60*24){
+              
+              if(item.type == 'buymatch'){ 
+                var price = item.bid[0].split` `[0]/item.ask.length;
+                volumeToday += parseInt(item.ask.length);
+                volumePriceToday += parseFloat(item.bid[0].split` `[0]);
+              }else{
+                var price = item.ask[0].split` `[0]/item.bid.length;
+                volumeToday += parseInt(item.bid.length);
+                volumePriceToday += parseFloat(item.ask[0].split` `[0]);
+              }
+              if(price >  highest){
+                highest = price;
+              }
+              if(price <  lowest){
+                lowest = price;
+              }
+
+          }
+          if(item.type == 'buymatch'){
+            return {
+              type: 'buy',
+              time: [time.getHours(),time.getMinutes(),time.getSeconds()].join`:`,
+              price: item.bid[0].split` `[0]/item.ask.length,
+              amount: item.ask.length
+            }
+          }else{
+            return {
+              type: 'sell',
+              time: [time.getHours(),time.getMinutes(),time.getSeconds()].join`:`,
+              price: item.ask[0].split` `[0]/item.bid.length,
+              amount: item.bid.length
+            }
+          }
+          
+          
+        });
+        setPriceHighest(highest);
+        setPriceLowest(lowest);
+        setVolumeDay(volumeToday);
+        setVolumePriceDay(volumePriceToday);
+        setDataMarket([...newMarket]);
+        if(userAccount){
+          let newTrade = [...res.data].map(item => {
+            if(item.asker == userAccount || item.bidder == userAccount){
+              
+              if(item.type == 'buymatch'){
+                var time = new Date(item.timestamp * 1000)
+                return {
+                  type: 'buy',
+                  time: [time.getHours(),time.getMinutes(),time.getSeconds()].join`:`,
+                  pair: symbolCurent.symbol + '/' + pairSymbol,
+                  price: item.bid[0].split` `[0]/item.ask.length,
+                  amount: item.ask.length,
+                  total: item.bid[0].split` `[0],
+                }
+              }else{
+                var time = new Date(item.timestamp * 1000)
+                return {
+                  type: 'sell',
+                  time: [time.getHours(),time.getMinutes(),time.getSeconds()].join`:`,
+                  pair: symbolCurent.symbol + '/' + pairSymbol,
+                  price: item.ask[0].split` `[0]/item.bid.length,
+                  amount: item.bid.length,
+                  total: item.ask[0].split` `[0],
+                }
+              }
+            }
+          });
+          setTradeHistory([...newTrade]);
+        }
+        
       }
-       
-      console.log(res);
+      
     })
   }
   async function getOrderBook() {
@@ -580,15 +659,18 @@ function Tradding() {
             </Col>
             <Col md="6" xs="24">
               <Typography.Text>
-                Vol: - {symbolCurent.symbol}
-              </Typography.Text>
-              <Typography.Text>
-                Low: -
+                Vol: {Intl.NumberFormat().format(volumeDay)} - {symbolCurent.symbol}
                 <br />
-                Height: -
+                Vol: {Intl.NumberFormat().format(volumePriceDay)} - {pairSymbol}
               </Typography.Text>
             </Col>
-
+            <Col md="6" xs="24">
+              <Typography.Text>
+                Low: {Intl.NumberFormat().format(priceLowest)}
+                <br/>
+                Height: {Intl.NumberFormat().format(priceHighest)}
+              </Typography.Text>
+            </Col>
 
           </Row>
         </Col>
@@ -650,7 +732,7 @@ function Tradding() {
           {contextHolder}
         </Context.Provider>
         {infomationSymbol()}
-        <Row justify="start">
+        <Row justify="start" gutter={16}>
           <Col xs={24} md={6}>
             <Table dataSource={orderBuy} columns={columnsOrder} pagination={false} scroll={{ y: 250 }} rowClassName="green" size="small" onRow={(r) => ({
               onClick: () => {
@@ -669,17 +751,13 @@ function Tradding() {
             })} />
           </Col>
           <Col xs={0} md={12}>
-              <ChartData />
+            { market.length > 0 && (
+              <ChartData market={market} symbol={pairSymbol} name={symbolCurent.name}/>
+            )}
 
           </Col>
           <Col xs={24} md={6}>
-            <Table dataSource={dataSymbol} columns={columnsSymbol} pagination={false} scroll={{ y: 360 }} size="small"
-              onRow={(r) => ({
-                onClick: () => {
-                  navigate('/tradding/' + r.pair);
-                }
-              })}
-            />
+            <Table dataSource={dataMarket} columns={columnsSymbol} pagination={false} scroll={{ y: 380 }} size="small" />
           </Col>
         </Row>
         <Row justify="start" gutter={16}>
