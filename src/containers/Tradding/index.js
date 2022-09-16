@@ -758,7 +758,7 @@ function Tradding() {
           
         </Row>
         <Row justify="start" gutter={16}>
-          <Col xs={24} md={8}>
+          <Col xs={24} md={7}>
             <Table   
               rowClassName={(record, index) => record.type == 'buy' ? 'green' :  'red'}
               dataSource={dataMarket} 
@@ -768,7 +768,7 @@ function Tradding() {
               size="small" 
             />
           </Col>
-          <Col xs="24" md={{ span: 16 }}>
+          <Col xs="24" md={{ span: 17 }}>
             <Row justify="start" gutter={16}>
               <Col xs="24" md={{ span: 12 }}>
 
