@@ -27,7 +27,7 @@ import { useParams } from 'react-router';
 import axios from 'axios';
 import ChartData from '../../components/Chart/ChartData';
 import { timeParse } from "d3-time-format";
-
+import logoPath from '../../assets/awmklogo.png';
 function Tradding() {
   var wax;
   const navigate = useNavigate();
@@ -246,14 +246,14 @@ function Tradding() {
             return {
               type: 'buy',
               time: [time.getHours(),time.getMinutes(),time.getSeconds()].join`:`,
-              price: item.bid[0].split` `[0]/item.ask.length,
+              price: toFixPrice(item.bid[0].split` `[0]/item.ask.length),
               amount: item.ask.length
             }
           }else{
             return {
               type: 'sell',
               time: [time.getHours(),time.getMinutes(),time.getSeconds()].join`:`,
-              price: item.ask[0].split` `[0]/item.bid.length,
+              price: toFixPrice(item.ask[0].split` `[0]/item.bid.length),
               amount: item.bid.length
             }
           }
@@ -275,7 +275,7 @@ function Tradding() {
                   type: 'buy',
                   time: [time.getHours(),time.getMinutes(),time.getSeconds()].join`:`,
                   pair: symbolCurent.symbol + '/' + pairSymbol,
-                  price: item.bid[0].split` `[0]/item.ask.length,
+                  price: toFixPrice(item.bid[0].split` `[0]/item.ask.length),
                   amount: item.ask.length,
                   total: item.bid[0].split` `[0],
                 }
@@ -285,7 +285,7 @@ function Tradding() {
                   type: 'sell',
                   time: [time.getHours(),time.getMinutes(),time.getSeconds()].join`:`,
                   pair: symbolCurent.symbol + '/' + pairSymbol,
-                  price: item.ask[0].split` `[0]/item.bid.length,
+                  price: toFixPrice(item.ask[0].split` `[0]/item.bid.length),
                   amount: item.bid.length,
                   total: item.ask[0].split` `[0],
                 }
@@ -316,6 +316,7 @@ function Tradding() {
       }
     }
   }
+  const toFixPrice = x => parseFloat(x).toFixed(symbolDefine[pairSymbol].unit)
   async function createBuyOrder() {
     axios({
       method: 'post',
@@ -353,9 +354,9 @@ function Tradding() {
             
             let total = parseFloat(item.bid.split(symbolDefine[pairSymbol].symbol)[0]).toFixed(symbolDefine[pairSymbol].unit);
             return {
-              price: '' + parseFloat(total/item.ask).toFixed(symbolDefine[pairSymbol].unit),
+              price: '' + toFixPrice(total/item.ask),
               amount: item.ask,
-              total: total,
+              total: toFixPrice(total),
             }
           }
         });
@@ -369,16 +370,16 @@ function Tradding() {
             }
           } else {
             processBuyOrder[baseData[i].price].amount += +baseData[i].amount;
-            processBuyOrder[baseData[i].price].total += +parseFloat(baseData[i].total).toFixed(symbolDefine[pairSymbol].unit);
+            processBuyOrder[baseData[i].price].total += +toFixPrice(baseData[i].total);
           }
         }
         var orderBuyArray = [];
         for (let key in processBuyOrder) {
           orderBuyArray.push(
             {
-              price: +key,
+              price: toFixPrice(key),
               amount: processBuyOrder[key].amount,
-              total: processBuyOrder[key].total,
+              total: toFixPrice(processBuyOrder[key].total),
             }
           )
         }
@@ -394,6 +395,7 @@ function Tradding() {
         })
       });
   }
+
   async function createSellOrder() {
     axios({
       method: 'post',
@@ -429,11 +431,11 @@ function Tradding() {
           }
           if (item.ask.split(symbolDefine[pairSymbol].symbol).length == 2) {
             
-            let price = parseFloat(item.ask.split(symbolDefine[pairSymbol].symbol)[0]/item.bid.length).toFixed(symbolDefine[pairSymbol].unit);
+            let price = toFixPrice(item.ask.split(symbolDefine[pairSymbol].symbol)[0]/item.bid.length);
             return {
-              price: '' + (price),
+              price: '' + toFixPrice(price),
               amount: item.bid.length,
-              total: parseFloat(item.ask.split(symbolDefine[pairSymbol].symbol)[0]).toFixed(symbolDefine[pairSymbol].unit),
+              total: toFixPrice(item.ask.split(symbolDefine[pairSymbol].symbol)[0]),
             }
           }
         });
@@ -454,9 +456,9 @@ function Tradding() {
         for (let key in processBuyOrder) {
           orderBuyArray.push(
             {
-              price: +key,
+              price: toFixPrice(key),
               amount: processBuyOrder[key].amount,
-              total: processBuyOrder[key].total,
+              total: parseFloat(processBuyOrder[key].total).toFixed(symbolDefine[pairSymbol].unit),
             }
           )
         }
@@ -640,35 +642,27 @@ function Tradding() {
       <Row style={{ margin: '10px 0' }}>
         <Col xs={{ span: 24 }}>
           <Row justify="start" gutter={16}>
-            <Col md="6" xs="24" >
-              <img src={symbolCurent.image} style={{ maxWidth: '40px' }} />
+            <Col md="10" xs="24" >
+              <img src={symbolCurent.image} style={{ maxWidth: '100px' }} />
             </Col>
-            <Col md="6" xs="24">
+            <Col md="14" xs="24">
               <Typography.Text>
-                NFT Name: {symbolCurent.name}
-                <br />
-                Shine: Stone
-              </Typography.Text>
-            </Col>
-            <Col md="6" xs="24">
-              <Typography.Text>
-                Pair: {symbolCurent.symbol}/{pairSymbol}
-                <br />
-                Template Id: {symbolCurent.template_id}
-              </Typography.Text>
-            </Col>
-            <Col md="6" xs="24">
-              <Typography.Text>
-                Vol: {Intl.NumberFormat().format(volumeDay)} - {symbolCurent.symbol}
-                <br />
-                Vol: {Intl.NumberFormat().format(volumePriceDay)} - {pairSymbol}
-              </Typography.Text>
-            </Col>
-            <Col md="6" xs="24">
-              <Typography.Text>
-                Low: {Intl.NumberFormat().format(priceLowest)}
-                <br/>
-                Height: {Intl.NumberFormat().format(priceHighest)}
+                  <b> NFT Name: {symbolCurent.name} </b> 
+                  <br/>
+                  <br/>
+                  <b>Shine</b>: Stone
+                  <br/>
+                  <b>Pair</b>: {symbolCurent.symbol}/{pairSymbol}
+                  <br />
+                  <b> Template Id </b>: {symbolCurent.template_id}
+                  <br />
+                  <b>24h Vol </b>: {Intl.NumberFormat().format(volumeDay)} - {symbolCurent.symbol}
+                  <br />
+                  <b>24h Vol </b>: {Intl.NumberFormat().format(volumePriceDay)} - {pairSymbol}
+                  <br />
+                  <b> Low </b>: {Intl.NumberFormat().format(priceLowest)}
+                  <br/>
+                  <b>High</b>: {Intl.NumberFormat().format(priceHighest)}
               </Typography.Text>
             </Col>
 
@@ -685,7 +679,9 @@ function Tradding() {
   const menuItems = [
     {
       key: 'logo',
-      label: 'ALIENWORLDS MARKET',
+      label: (
+        <img src={logoPath} style={{maxHeight: '50px'}} />
+      ),
       className: 'fontsize150',
     },
     {
@@ -723,7 +719,7 @@ function Tradding() {
         <Menu theme="light" mode="horizontal" defaultSelectedKeys={['mail']} items={menuItems} />
 
       </Header>
-      <Content style={{ padding: '0 50px' }}>
+      <Content style={{ padding: '10px 50px' }}>
         <Context.Provider
           value={{
             name: 'Notification',
@@ -731,9 +727,12 @@ function Tradding() {
         >
           {contextHolder}
         </Context.Provider>
-        {infomationSymbol()}
-        <Row justify="start" gutter={16}>
-          <Col xs={24} md={6}>
+        
+        <Row justify="start" gutter={16} mt={4}>
+          <Col xs={24} md={7}>
+            {infomationSymbol()}
+          </Col>
+          <Col xs={24} md={7}>
             <Table dataSource={orderBuy} columns={columnsOrder} pagination={false} scroll={{ y: 250 }} rowClassName="green" size="small" onRow={(r) => ({
               onClick: () => {
                 setSellPrice(r.price);
@@ -750,35 +749,26 @@ function Tradding() {
               }
             })} />
           </Col>
-          <Col xs={0} md={12}>
+          <Col xs={0} md={10}>
             { market.length > 0 && (
               <ChartData market={market} symbol={pairSymbol} name={symbolCurent.name}/>
             )}
 
           </Col>
-          <Col xs={24} md={6}>
-            <Table dataSource={dataMarket} columns={columnsSymbol} pagination={false} scroll={{ y: 380 }} size="small" />
-          </Col>
+          
         </Row>
         <Row justify="start" gutter={16}>
-          <Col xs="24" md={{ span: 12 }}>
-            <Title level={5}>Open orders</Title>
-            <Table dataSource={openOrder} columns={[...columnsTradeHistory,{
-                title: 'Action',
-                dataIndex: 'action',
-                align: 'center',
-                render: (_, record) => (
-                  <Space size="middle">
-                    <CloseOutlined onClick={() => cancelOrder(record.id,record.type)} />
-                  </Space>
-                ),
-            }]} pagination={false} scroll={{ y: 220 }} />
-            <br />
-            <Title level={5}>Trade history</Title>
-            <Table dataSource={tradeHistory} columns={columnsTradeHistory} pagination={false} scroll={{ y: 220 }} />
-
+          <Col xs={24} md={8}>
+            <Table   
+              rowClassName={(record, index) => record.type == 'buy' ? 'green' :  'red'}
+              dataSource={dataMarket} 
+              columns={columnsSymbol} 
+              pagination={false} 
+              scroll={{ y: 380 }} 
+              size="small" 
+            />
           </Col>
-          <Col xs="24" md={{ span: 12 }}>
+          <Col xs="24" md={{ span: 16 }}>
             <Row justify="start" gutter={16}>
               <Col xs="24" md={{ span: 12 }}>
 
@@ -820,6 +810,24 @@ function Tradding() {
               </Col>
             </Row>
           </Col>
+          <Col xs="24" md={{ span: 24 }}>
+            <Title level={5}>Open orders</Title>
+            <Table dataSource={openOrder} columns={[...columnsTradeHistory,{
+                title: 'Action',
+                dataIndex: 'action',
+                align: 'center',
+                render: (_, record) => (
+                  <Space size="middle">
+                    <CloseOutlined onClick={() => cancelOrder(record.id,record.type)} />
+                  </Space>
+                ),
+            }]} pagination={false} scroll={{ y: 220 }} />
+            <br />
+            <Title level={5}>Trade history</Title>
+            <Table dataSource={tradeHistory} columns={columnsTradeHistory} pagination={false} scroll={{ y: 220 }} />
+
+          </Col>
+          
         </Row>
       </Content>
       <Footer style={{ textAlign: 'center' }}> ©2022 Created by Alienworlds marketplace</Footer>

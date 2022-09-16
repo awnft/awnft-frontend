@@ -32,7 +32,7 @@ export const columnsOrder = [
 ];
 export const columnsSymbol = [
   {
-    title: 'type',
+    title: 'Type',
     dataIndex: 'type',
     key: 'type',
     align: 'left',
@@ -60,7 +60,7 @@ export const columnsTradeHistory = [
   {
     title: 'Time',
     dataIndex: 'time',
-    sorter: (a, b) => new Date(a.date) - new Date(b.date),
+    sorter: (a, b) => new Date(a.date*1000) - new Date(b.date*1000),
     key: 'time',
   },
   {
