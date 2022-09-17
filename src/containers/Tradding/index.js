@@ -58,7 +58,7 @@ function Tradding() {
 
   // Info pair
   const [priceHighest, setPriceHighest] = useState(0);
-  const [priceLowest, setPriceLowest] = useState(999999);
+  const [priceLowest, setPriceLowest] = useState(99999);
   const [volumeDay, setVolumeDay] = useState(0);
   const [volumePriceDay, setVolumePriceDay] = useState(0);
 
@@ -177,6 +177,7 @@ function Tradding() {
   }, []);
 
   const clearData = () => {
+    setCurentPrice(null);
     setBalance(null);
     setBalanceSymbol([]);
     setOpenOrder([]);
@@ -184,10 +185,14 @@ function Tradding() {
     setOpenOrderSell([]);
     setOrderBuy([]);
     setOrderSell([]);
-    getBlance(userAccount);
-    getBlanceNfts(userAccount);
+    updateData();
+  }
+  const updateData = () => {
+    if(userAccount){
+      getBlance(userAccount);
+      getBlanceNfts(userAccount);
+    }
     getOrderBook();
-    
   }
   async function getMarketData() { 
     axios({
@@ -584,7 +589,7 @@ function Tradding() {
           });
           setTimeout(function(){
             clearData();
-          },2000)
+          },4000)
           
         })
     } catch (error) {
@@ -637,6 +642,7 @@ function Tradding() {
       })
     }
   }
+  
   const infomationSymbol = () => {
     return (
       <Row style={{ margin: '10px 0' }}>
@@ -649,9 +655,6 @@ function Tradding() {
               <Typography.Text>
                   <b> NFT Name: {symbolCurent.name} </b> 
                   <br/>
-                  <br/>
-                  <b>Shine</b>: Stone
-                  <br/>
                   <b>Pair</b>: {symbolCurent.symbol}/{pairSymbol}
                   <br />
                   <b> Template Id </b>: {symbolCurent.template_id}
@@ -663,6 +666,21 @@ function Tradding() {
                   <b> Low </b>: {Intl.NumberFormat().format(priceLowest)}
                   <br/>
                   <b>High</b>: {Intl.NumberFormat().format(priceHighest)}
+                  <br/>
+              </Typography.Text>
+              <Typography.Text>
+                {symbolCurent?.attributes?.length > 0 && (
+                  <>
+                    {symbolCurent.attributes.map(item => {
+                      return (
+                        <>
+                          <b> {item.key} </b> : {item.value}
+                          <br/>
+                        </>
+                      )
+                    })}
+                  </>
+                )}
               </Typography.Text>
             </Col>
 
@@ -733,7 +751,7 @@ function Tradding() {
             {infomationSymbol()}
           </Col>
           <Col xs={24} md={7}>
-            <Table dataSource={orderBuy} columns={columnsOrder} pagination={false} scroll={{ y: 250 }} rowClassName="green" size="small" onRow={(r) => ({
+            <Table dataSource={orderBuy} columns={columnsOrder} pagination={false} scroll={{ y: 185 }} rowClassName="green" size="small" onRow={(r) => ({
               onClick: () => {
                 setSellPrice(r.price);
                 setBuyPrice(r.price);
@@ -742,7 +760,7 @@ function Tradding() {
             <div style={{ float: 'left', fontWeight: 'bold', fontSize: '20px', margin: '5px' }}>
               {curentPrice}
             </div>
-            <Table dataSource={orderSell} columns={columnsOrder} pagination={false} showHeader={false} scroll={{ y: 250 }} rowClassName="red" size="small" onRow={(r) => ({
+            <Table dataSource={orderSell} columns={columnsOrder} pagination={false} showHeader={false} scroll={{ y: 185 }} rowClassName="red" size="small" onRow={(r) => ({
               onClick: () => {
                 setSellPrice(r.price);
                 setBuyPrice(r.price);
