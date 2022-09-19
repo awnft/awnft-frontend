@@ -176,11 +176,12 @@ function Tradding() {
     getMarketData();
     setTimeout(function(){
       clearData();
+      if(userAccount){
+        getBlance(userAccount);
+        getBlanceNfts(userAccount);
+      }
     },200)
-    if(userAccount){
-      getBlance(userAccount);
-      getBlanceNfts(userAccount);
-    }
+    
   }, [symbolCurent, pairSymbol, userAccount])
   useEffect(() => {
     //wax = new waxjs.WaxJS('https://wax.greymass.com', null, null, false);
