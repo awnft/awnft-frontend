@@ -37,12 +37,12 @@ function Tradding() {
   const params = useParams();
   const { Title } = Typography;
   const { Header, Content, Footer } = Layout;
-  
+
   const [userAccount, setUserAccount] = useState('');
   const [waxJs, setWaxJs] = useState(null);
   const [balance, setBalance] = useState(null);
   const [balanceSymbol, setBalanceSymbol] = useState([]);
-  const [market,setMarket] = useState([]);
+  const [market, setMarket] = useState([]);
   const [textToast, contextHolder] = notification.useNotification();
   const [noti, setNoti] = useState({ status: '', content: '' });
   const [orderBuy, setOrderBuy] = useState([]);
@@ -82,13 +82,13 @@ function Tradding() {
       'https://wax.eosrio.io',
       'https://api.wax.alohaeos.com',
     ];
-    return endpointList[~~(Math.random()*(endpointList.length-1))]
+    return endpointList[~~(Math.random() * (endpointList.length - 1))]
   }
   const [] = useState(null);
 
 
 
-  const [symbolCurent, setSymbolCurent] = useState(nftsWaxList[1]);
+  const [symbolCurent, setSymbolCurent] = useState(nftsWaxList[0]);
   const [pairSymbol, setPairSymbol] = useState('TLM');
 
   // const [dataSymbol] = useState([...nftsWaxList.map(x => { return { pair: x.symbol + '/Wax', price: '-', volume: '-' } }), ...nftsWaxList.map(x => { return { pair: x.symbol + '/Tlm', price: '-', volume: '-' } })]);
@@ -99,7 +99,7 @@ function Tradding() {
   const [tradeHistory, setTradeHistory] = useState([]);
   const [dataMarket, setDataMarket] = useState([]);
 
-  
+
 
   // --- Get data wallet ---//
   const getBlance = async (userAccount) => {
@@ -107,7 +107,7 @@ function Tradding() {
       var rpc = rpc_endpoint();
       axios({
         method: 'post',
-        url: rpc+'/v1/chain/get_currency_balance',
+        url: rpc + '/v1/chain/get_currency_balance',
         data: JSON.stringify({ "code": symbolDefine[pairSymbol].code, "account": userAccount, "symbol": pairSymbol.toUpperCase() })
       }).then(res => {
         if (res.status === 200) {
@@ -122,7 +122,7 @@ function Tradding() {
         .catch(error => {
           setNoti({
             status: 'Get Balance Error',
-            content: error+ ' '+ rpc,
+            content: error + ' ' + rpc,
           })
           getBlance(userAccount);
         });
@@ -149,7 +149,7 @@ function Tradding() {
             status: 'Nfts loading Error',
             content: error,
           })
-          
+
         });
     }
 
@@ -174,14 +174,14 @@ function Tradding() {
   }, [openOrderBuy, openOrderSell])
   useEffect(() => {
     getMarketData();
-    setTimeout(function(){
+    setTimeout(function () {
       clearData();
-      if(userAccount){
+      if (userAccount) {
         getBlance(userAccount);
         getBlanceNfts(userAccount);
       }
-    },200)
-    
+    }, 200)
+
   }, [symbolCurent, pairSymbol, userAccount])
   useEffect(() => {
     //wax = new waxjs.WaxJS('https://wax.greymass.com', null, null, false);
@@ -190,13 +190,13 @@ function Tradding() {
     });
     setWaxJs(wax);
     checkAutoLoginAndLogin();
-    setInterval(function(){
+    setInterval(function () {
       updateData();
-      if(userAccount){
+      if (userAccount) {
         getBlance(userAccount);
         getBlanceNfts(userAccount);
       }
-    },60000)
+    }, 60000)
   }, []);
   // useEffect(() => {
   //   if(userAccount){
@@ -204,9 +204,9 @@ function Tradding() {
   //     getBlanceNfts(userAccount);
   //     getOrderBook(userAccount);
   //   }
-    
+
   // }, [userAccount]);
-  
+
   const clearData = () => {
     setNoti({
       status: '',
@@ -226,7 +226,7 @@ function Tradding() {
     getOrderBook();
   }
   const checkFormat = (data) => {
-    return data < 10 ? "0"+data : data
+    return data < 10 ? "0" + data : data
   }
   const timeFormat = (time) => {
     var hour = checkFormat(time.getHours());
@@ -234,31 +234,31 @@ function Tradding() {
     var seconds = checkFormat(time.getSeconds());
     var date = checkFormat(time.getDate());
     var month = checkFormat(time.getMonth());
-    return [month,date].join`/`+' '+[hour,minutes,seconds].join`:`;
-    
+    return [month, date].join`/` + ' ' + [hour, minutes, seconds].join`:`;
+
   }
-  async function getMarketData() { 
+  async function getMarketData() {
     axios({
       method: 'post',
-      url: 'https://api.cleancodevietnam.com/wax/api/v0/search',
+      url: '/wax/api/v0/search',
       data: {
         "mk_id": symbolCurent.scope,
-        "base_token_sym": symbolDefine[pairSymbol].unit+','+symbolDefine[pairSymbol].symbol,
+        "base_token_sym": symbolDefine[pairSymbol].unit + ',' + symbolDefine[pairSymbol].symbol,
         "base_token_id": symbolCurent.scope,
       }
     }).then(res => {
-      if(res.data){
+      if (res.data) {
         let newData = [...res.data].map(item => {
-          if(item.type == 'buymatch'){
+          if (item.type == 'buymatch') {
             return {
               x: new Date(item.timestamp * 1000),
-              y: item.bid[0].split` `[0]/item.ask.length,
+              y: item.bid[0].split` `[0] / item.ask.length,
               z: item.ask.length
             }
-          }else{
+          } else {
             return {
               x: new Date(item.timestamp * 1000),
-              y: item.ask[0].split` `[0]/item.bid.length,
+              y: item.ask[0].split` `[0] / item.bid.length,
               z: item.bid.length
             }
           }
@@ -271,70 +271,70 @@ function Tradding() {
         var lowest = priceLowest;
         let newMarket = [...res.data].map(item => {
           var time = new Date(item.timestamp * 1000);
-          if(time  > today - 1000*60*60*24){
-              
-              if(item.type == 'buymatch'){ 
-                var price = item.bid[0].split` `[0]/item.ask.length;
-                volumeToday += parseInt(item.ask.length);
-                volumePriceToday += parseFloat(item.bid[0].split` `[0]);
-              }else{
-                var price = item.ask[0].split` `[0]/item.bid.length;
-                volumeToday += parseInt(item.bid.length);
-                volumePriceToday += parseFloat(item.ask[0].split` `[0]);
-              }
-              if(price >  highest){
-                highest = price;
-              }
-              if(price <  lowest){
-                lowest = price;
-              }
+          if (time > today - 1000 * 60 * 60 * 24) {
+
+            if (item.type == 'buymatch') {
+              var price = item.bid[0].split` `[0] / item.ask.length;
+              volumeToday += parseInt(item.ask.length);
+              volumePriceToday += parseFloat(item.bid[0].split` `[0]);
+            } else {
+              var price = item.ask[0].split` `[0] / item.bid.length;
+              volumeToday += parseInt(item.bid.length);
+              volumePriceToday += parseFloat(item.ask[0].split` `[0]);
+            }
+            if (price > highest) {
+              highest = price;
+            }
+            if (price < lowest) {
+              lowest = price;
+            }
 
           }
-          if(item.type == 'buymatch'){
+          if (item.type == 'buymatch') {
             return {
               type: 'buy',
               time: timeFormat(time),
-              price: toFixPrice(item.bid[0].split` `[0]/item.ask.length),
+              price: toFixPrice(item.bid[0].split` `[0] / item.ask.length),
               amount: item.ask.length
             }
-          }else{
+          } else {
             return {
               type: 'sell',
               time: timeFormat(time),
-              price: toFixPrice(item.ask[0].split` `[0]/item.bid.length),
+              price: toFixPrice(item.ask[0].split` `[0] / item.bid.length),
               amount: item.bid.length
             }
           }
-          
-          
+
+
         });
         setPriceHighest(highest);
         setPriceLowest(lowest);
         setVolumeDay(volumeToday);
         setVolumePriceDay(volumePriceToday);
         setDataMarket([...newMarket.reverse()]);
-        if(userAccount){
+        if (userAccount) {
           let newTrade = [];
           res.data.map(item => {
-            if(item.asker == userAccount || item.bidder == userAccount){
-              
-              if(item.type == 'buymatch'){
+            if (item.asker == userAccount || item.bidder == userAccount) {
+
+              if (item.type == 'buymatch') {
                 var time = new Date(item.timestamp * 1000)
                 newTrade.push({
                   type: 'buy',
                   time: timeFormat(time),
                   pair: symbolCurent.symbol + '/' + pairSymbol,
-                  price: toFixPrice(item.bid[0].split` `[0]/item.ask.length),
+                  price: toFixPrice(item.bid[0].split` `[0] / item.ask.length),
                   amount: item.ask.length,
                   total: item.bid[0].split` `[0],
                 })
-              }else{
+              } else {
                 var time = new Date(item.timestamp * 1000)
-                newTrade.push( {
+                newTrade.push({
                   type: 'sell',
                   time: timeFormat(time),
                   pair: symbolCurent.symbol + '/' + pairSymbol,
-                  price: toFixPrice(item.ask[0].split` `[0]/item.bid.length),
+                  price: toFixPrice(item.ask[0].split` `[0] / item.bid.length),
                   amount: item.bid.length,
                   total: item.ask[0].split` `[0],
                 })
@@ -344,9 +344,9 @@ function Tradding() {
           console.log(newTrade);
           setTradeHistory([...newTrade]);
         }
-        
+
       }
-      
+
     })
   }
   async function getOrderBook() {
@@ -370,7 +370,7 @@ function Tradding() {
     var rpc = rpc_endpoint();
     axios({
       method: 'post',
-      url: rpc+'/v1/chain/get_table_rows',
+      url: rpc + '/v1/chain/get_table_rows',
       data: JSON.stringify({
         code: "awmarketmain",
         index_position: 1,
@@ -392,26 +392,26 @@ function Tradding() {
           if (item.account == userAccount) {
             baseOrder.push({
               id: item.id,
-              time: timeFormat(new Date(item.timestamp*1000)),
+              time: timeFormat(new Date(item.timestamp * 1000)),
               pair: symbolCurent.symbol + '/' + item.bid.split(' ')[1],
               type: 'Buy',
-              price: parseFloat(item.bid.split(' ')[0]/item.ask).toFixed(4),
+              price: parseFloat(item.bid.split(' ')[0] / item.ask).toFixed(4),
               amount: ~~(item.ask),
               total: parseFloat(item.bid.split(' ')[0]).toFixed(4),
             });
           }
           if (item.bid.split(symbolDefine[pairSymbol].symbol).length == 2) {
-            
+
             let total = parseFloat(item.bid.split(symbolDefine[pairSymbol].symbol)[0]).toFixed(symbolDefine[pairSymbol].unit);
             return {
-              price: '' + toFixPrice(total/item.ask),
+              price: '' + toFixPrice(total / item.ask),
               amount: item.ask,
               total: toFixPrice(total),
             }
           }
         });
         setOpenOrderBuy([...baseOrder]);
-        
+
         const processBuyOrder = {};
         for (let i = 0; i < baseData.length; i++) {
           if (!processBuyOrder[baseData[i].price]) {
@@ -452,7 +452,7 @@ function Tradding() {
     var rpc = rpc_endpoint()
     axios({
       method: 'post',
-      url: rpc+'/v1/chain/get_table_rows',
+      url: rpc + '/v1/chain/get_table_rows',
       data: JSON.stringify({
         code: "awmarketmain",
         index_position: 1,
@@ -474,17 +474,17 @@ function Tradding() {
           if (item.account == userAccount) {
             baseOrder.push({
               id: item.id,
-              time: timeFormat(new Date(item.timestamp*1000)),
+              time: timeFormat(new Date(item.timestamp * 1000)),
               pair: symbolCurent.symbol + '/' + item.ask.split(' ')[1],
               type: 'Sell',
-              price: item.ask.split(' ')[0]/item.bid.length,
+              price: item.ask.split(' ')[0] / item.bid.length,
               amount: item.bid.length,
               total: parseFloat(item.ask.split(' ')[0]),
             });
           }
           if (item.ask.split(symbolDefine[pairSymbol].symbol).length == 2) {
-            
-            let price = toFixPrice(item.ask.split(symbolDefine[pairSymbol].symbol)[0]/item.bid.length);
+
+            let price = toFixPrice(item.ask.split(symbolDefine[pairSymbol].symbol)[0] / item.bid.length);
             return {
               price: '' + toFixPrice(price),
               amount: item.bid.length,
@@ -537,7 +537,7 @@ function Tradding() {
     }
     var isAutoLoginAwailable = await wax.isAutoLoginAvailable();
     console.log("Auto login", isAutoLoginAwailable);
-    if(isAutoLoginAwailable){
+    if (isAutoLoginAwailable) {
       var userAccount2 = wax.user.account;
       setUserAccount(userAccount2);
       // var pubKeys2 = wax.pubKeys
@@ -611,7 +611,7 @@ function Tradding() {
           from: userAccount,
           to: contractName,
           asset_ids: [...balanceSymbol.slice(0, sellAmount).map(item => item.asset_id)],
-          memo: 'awnftmarket#' + symbolCurent.scope + '#' + (sellPrice*sellAmount) * (10 ** symbolDefine[pairSymbol].unit),
+          memo: 'awnftmarket#' + symbolCurent.scope + '#' + (sellPrice * sellAmount) * (10 ** symbolDefine[pairSymbol].unit),
         }
       },
     ];
@@ -638,10 +638,10 @@ function Tradding() {
             status: 'Success',
             content: 'transaction id: ' + result.transaction_id,
           });
-          setTimeout(function(){
+          setTimeout(function () {
             clearData();
-          },4000)
-          
+          }, 4000)
+
         })
     } catch (error) {
       setNoti({
@@ -650,11 +650,11 @@ function Tradding() {
       })
     }
   }
-  async function cancelOrder(id,type){
+  async function cancelOrder(id, type) {
     const actions = [
       {
         account: "awmarketmain",
-        name: type =='Buy'? "cancelbuy" : "cancelsell",
+        name: type == 'Buy' ? "cancelbuy" : "cancelsell",
         authorization: [
           {
             actor: userAccount,
@@ -685,7 +685,7 @@ function Tradding() {
       // getBlance(userAccount2);
       // getBlanceNfts(userAccount2);
       setWaxJs(wax);
-      
+
     } catch (error) {
       console.error('User fail to login.', error);
       setNoti({
@@ -694,40 +694,40 @@ function Tradding() {
       })
     }
   }
-  
+
   const infomationSymbol = () => {
     return (
       <Row>
         <Col xs={{ span: 24 }}>
-          <Row justify="start" gutter={[16,16]}>
+          <Row justify="start" gutter={[16, 16]}>
             <Col flex="60px">
               <img src={symbolCurent.image} style={{ maxWidth: '60px' }} />
             </Col>
             <Col xs={12} md={4}>
               <Typography.Text>
-                  <b> NFT Name: {symbolCurent.name} </b> 
-                  <br/>
-                  <b>Pair</b>: {symbolCurent.symbol}/{pairSymbol}
-                  <br />
-                  <b> Template Id </b>: {symbolCurent.template_id}
-                  <br/>
+                <b> NFT Name: {symbolCurent.name} </b>
+                <br />
+                <b>Pair</b>: {symbolCurent.symbol}/{pairSymbol}
+                <br />
+                <b> Template Id </b>: {symbolCurent.template_id}
+                <br />
               </Typography.Text>
             </Col>
-            
+
             <Col xs={12} md={4}>
               <Typography.Text>
-                  <b>24h Vol </b>: {Intl.NumberFormat().format(volumeDay)} - {symbolCurent.symbol}
-                  <br />
-                  <b>24h Vol </b>: {Intl.NumberFormat().format(volumePriceDay)} - {pairSymbol}
-                  <br />
+                <b>24h Vol </b>: {Intl.NumberFormat().format(volumeDay)} - {symbolCurent.symbol}
+                <br />
+                <b>24h Vol </b>: {Intl.NumberFormat().format(volumePriceDay)} - {pairSymbol}
+                <br />
               </Typography.Text>
             </Col>
             <Col xs={12} md={3}>
               <Typography.Text>
-                  <b> Low </b>: {Intl.NumberFormat().format(priceLowest)}
-                  <br/>
-                  <b>High</b>: {Intl.NumberFormat().format(priceHighest)}
-                  <br/>
+                <b> Low </b>: {Intl.NumberFormat().format(priceLowest)}
+                <br />
+                <b>High</b>: {Intl.NumberFormat().format(priceHighest)}
+                <br />
               </Typography.Text>
             </Col>
             <Col xs={12} md={11}>
@@ -736,21 +736,21 @@ function Tradding() {
                   <>
                     {symbolCurent.attributes.map(item => {
                       return (
-                        
-                          <Typography.Text>
-                            <b> {item.key}: </b> {item.value}
-                            <br/>
-                          </Typography.Text>
-                        
+
+                        <Typography.Text>
+                          <b> {item.key.charAt(0).toUpperCase() + item.key.slice(1)}: </b> {item.value}
+                          <br />
+                        </Typography.Text>
+
                       )
                     })}
                   </>
                 )}
               </Space>
             </Col>
-            
-              
-            
+
+
+
 
           </Row>
         </Col>
@@ -766,7 +766,7 @@ function Tradding() {
     {
       key: 'logo',
       label: (
-        <img src={logoPath} style={{maxHeight: '50px'}} />
+        <img src={logoPath} style={{ maxHeight: '50px' }} />
       ),
       className: 'fontsize150',
     },
@@ -791,13 +791,13 @@ function Tradding() {
       label: userAccount ? (
         userAccount
       ) :
-      (
-        <Button onClick={()=>login()}>Login</Button>
-      ),
+        (
+          <Button onClick={() => login()}>Login</Button>
+        ),
       icon: <LoginOutlined />,
     }
   ]
-  
+
   return (
     <Layout className="layout">
       <Header>
@@ -813,8 +813,8 @@ function Tradding() {
         >
           {contextHolder}
         </Context.Provider>
-        
-        <Row justify="start" gutter={[16,16]} mt={4}>
+
+        <Row justify="start" gutter={[16, 16]} mt={4}>
           <Col xs={24} md={24}>
             {infomationSymbol()}
           </Col>
@@ -836,26 +836,26 @@ function Tradding() {
             })} />
           </Col>
           <Col xs={24} md={10}>
-            { market.length > 0 && (
-              <ChartData market={market} symbol={pairSymbol} name={symbolCurent.name}/>
+            {market.length > 0 && (
+              <ChartData market={market} symbol={pairSymbol} name={symbolCurent.name} />
             )}
 
           </Col>
           <Col xs={24} md={7}>
-            <Table   
-              rowClassName={(record, index) => record.type == 'buy' ? 'green' :  'red'}
-              dataSource={dataMarket} 
-              columns={columnsSymbol} 
-              pagination={false} 
-              scroll={{ y: 380 }} 
-              size="small" 
+            <Table
+              rowClassName={(record, index) => record.type == 'buy' ? 'green' : 'red'}
+              dataSource={dataMarket}
+              columns={columnsSymbol}
+              pagination={false}
+              scroll={{ y: 380 }}
+              size="small"
             />
           </Col>
         </Row>
-        <Row justify="start" gutter={[16,16]} align="right">
-          
+        <Row justify="start" gutter={[16, 16]} align="right">
+
           <Col xs="24" md={{ span: 10 }}>
-            <Row justify="center" gutter={[16,16]}>
+            <Row justify="center" gutter={[16, 16]}>
               <Col xs="24" md={{ span: 12 }}>
 
                 <Input.Group size="large"></Input.Group>
@@ -876,44 +876,44 @@ function Tradding() {
                 </Space>
               </Col>
               <Col xs="24" md={{ span: 12 }}>
-              <Spin spinning={loading}>
-                <Space direction="vertical">
-                  <Title level={5}>Sell {symbolCurent.name} | Limit trade</Title>
-                  
+                <Spin spinning={loading}>
+                  <Space direction="vertical">
+                    <Title level={5}>Sell {symbolCurent.name} | Limit trade</Title>
+
                     <Typography.Text className="ant-form-text" type="secondary">
                       Balance:  {balanceSymbol.length >= 1000 ? '>=' : ''}{Intl.NumberFormat().format(balanceSymbol.length)} {symbolCurent.name}
-                      
+
                     </Typography.Text>
                     <Input addonBefore="Price" addonAfter={pairSymbol} defaultValue="" value={sellPrice} onChange={(v) => setSellPrice(v.target.value)} />
                     <InputNumber min={1} addonBefore="Amount" addonAfter={symbolCurent.symbol} value={sellAmount} onChange={(v) => setSellAmount(Math.floor(v))} />
                     <Slider defaultValue={0} marks={{ 0: '0%', 25: '25%', 50: '50%', 75: '75%', 100: '100%' }} onChange={(v) => setSellAmount(Math.floor(balanceSymbol.length * v / 100))} />
                     <Input addonBefore="Total" addonAfter={pairSymbol} value={sellPrice && sellAmount ? new Intl.NumberFormat().format(sellPrice * sellAmount) : ''} disabled />
                     <Button style={{ width: "100%" }} onClick={sellEvent} type="primary" danger>Sell {symbolCurent.name}</Button>
-                 
-                  
-                </Space>
-              </Spin>
+
+
+                  </Space>
+                </Spin>
               </Col>
             </Row>
           </Col>
           <Col xs="24" md={{ span: 14 }}>
             <Title level={5}>Open orders</Title>
-            <Table dataSource={openOrder} columns={[...columnsTradeHistory,{
-                title: 'Action',
-                dataIndex: 'action',
-                align: 'center',
-                render: (_, record) => (
-                  <Space size="middle">
-                    <CloseOutlined onClick={() => cancelOrder(record.id,record.type)} />
-                  </Space>
-                ),
+            <Table dataSource={openOrder} columns={[...columnsTradeHistory, {
+              title: 'Action',
+              dataIndex: 'action',
+              align: 'center',
+              render: (_, record) => (
+                <Space size="middle">
+                  <CloseOutlined onClick={() => cancelOrder(record.id, record.type)} />
+                </Space>
+              ),
             }]} pagination={false} scroll={{ y: 220 }} />
             <br />
             <Title level={5}>Trade history</Title>
             <Table dataSource={tradeHistory} columns={columnsTradeHistory} pagination={false} scroll={{ y: 220 }} />
 
           </Col>
-          
+
         </Row>
       </Content>
       <Footer style={{ textAlign: 'center' }}> ©2022 Created by Alienworlds marketplace</Footer>
