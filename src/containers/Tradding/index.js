@@ -192,6 +192,10 @@ function Tradding() {
     checkAutoLoginAndLogin();
     setInterval(function(){
       clearData();
+      if(userAccount){
+        getBlance(userAccount);
+        getBlanceNfts(userAccount);
+      }
     },60000)
   }, []);
   // useEffect(() => {
