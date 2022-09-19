@@ -187,7 +187,7 @@ function Tradding() {
     checkAutoLoginAndLogin();
     setInterval(function(){
       clearData();
-    },35000)
+    },60000)
   }, []);
   // useEffect(() => {
   //   if(userAccount){
@@ -528,13 +528,14 @@ function Tradding() {
     }
     var isAutoLoginAwailable = await wax.isAutoLoginAvailable();
     console.log("Auto login", isAutoLoginAwailable);
-    var userAccount2 = wax.user.account;
-    setUserAccount(userAccount2);
-    // var pubKeys2 = wax.pubKeys
-    // setPubKeys(pubKeys2);
-    getBlance(userAccount2);
-    getBlanceNfts(userAccount2);
-    
+    if(isAutoLoginAwailable){
+      var userAccount2 = wax.user.account;
+      setUserAccount(userAccount2);
+      // var pubKeys2 = wax.pubKeys
+      // setPubKeys(pubKeys2);
+      getBlance(userAccount2);
+      getBlanceNfts(userAccount2);
+    }
     return isAutoLoginAwailable;
   }
   async function buyEvent() {
