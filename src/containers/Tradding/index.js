@@ -72,7 +72,18 @@ function Tradding() {
       });
     }
   };
-
+  const rpc_endpoint = () => {
+    var endpointList = [
+      'https://wax.eosdac.io',
+      'https://wax.greymass.com',
+      'https://api.waxsweden.org',
+      'https://wax.api.eosnation.io',
+      'https://wax.eu.eosamsterdam.net',
+      'https://wax.eosrio.io',
+      'https://api.wax.alohaeos.com',
+    ];
+    return endpointList[~~(Math.random()*(endpointList.length-1))]
+  }
   const [] = useState(null);
 
 
@@ -93,9 +104,10 @@ function Tradding() {
   // --- Get data wallet ---//
   const getBlance = async (userAccount) => {
     if (userAccount) {
+      var rpc = rpc_endpoint();
       axios({
         method: 'post',
-        url: 'https://wax.greymass.com/v1/chain/get_currency_balance',
+        url: rpc+'/v1/chain/get_currency_balance',
         data: JSON.stringify({ "code": symbolDefine[pairSymbol].code, "account": userAccount, "symbol": pairSymbol.toUpperCase() })
       }).then(res => {
         if (res.status === 200) {
@@ -109,9 +121,10 @@ function Tradding() {
       })
         .catch(error => {
           setNoti({
-            status: 'Error',
-            content: error,
+            status: 'Get Balance Error',
+            content: error+ ' '+ rpc,
           })
+          getBlance(userAccount);
         });
 
     }
@@ -172,7 +185,9 @@ function Tradding() {
     });
     setWaxJs(wax);
     checkAutoLoginAndLogin();
-    
+    setInterval(function(){
+      clearData();
+    },35000)
   }, []);
   // useEffect(() => {
   //   if(userAccount){
@@ -288,7 +303,7 @@ function Tradding() {
         setPriceLowest(lowest);
         setVolumeDay(volumeToday);
         setVolumePriceDay(volumePriceToday);
-        setDataMarket([...newMarket]);
+        setDataMarket([...newMarket.reverse()]);
         if(userAccount){
           let newTrade = [];
           res.data.map(item => {
@@ -343,9 +358,10 @@ function Tradding() {
   }
   const toFixPrice = x => parseFloat(x).toFixed(symbolDefine[pairSymbol].unit)
   async function createBuyOrder() {
+    var rpc = rpc_endpoint();
     axios({
       method: 'post',
-      url: 'https://wax.greymass.com/v1/chain/get_table_rows',
+      url: rpc+'/v1/chain/get_table_rows',
       data: JSON.stringify({
         code: "awmarketmain",
         index_position: 1,
@@ -415,17 +431,19 @@ function Tradding() {
       }
     })
       .catch(error => {
-        setNoti({
-          status: 'Error',
-          content: error,
-        })
+        // setNoti({
+        //   status: 'Get Order Error',
+        //   content: error + ' '+ rpc,
+        // })
+        createBuyOrder();
       });
   }
 
   async function createSellOrder() {
+    var rpc = rpc_endpoint()
     axios({
       method: 'post',
-      url: 'https://wax.greymass.com/v1/chain/get_table_rows',
+      url: rpc+'/v1/chain/get_table_rows',
       data: JSON.stringify({
         code: "awmarketmain",
         index_position: 1,
@@ -494,10 +512,11 @@ function Tradding() {
       }
     })
       .catch(error => {
-        setNoti({
-          status: 'Error',
-          content: error,
-        })
+        // setNoti({
+        //   status: 'Get Order Error',
+        //   content: error +' '+rpc,
+        // })
+        createSellOrder();
       });
   }
   async function checkAutoLoginAndLogin() {
@@ -616,7 +635,7 @@ function Tradding() {
         })
     } catch (error) {
       setNoti({
-        status: 'Error',
+        status: 'Action Error',
         content: error,
       })
     }
