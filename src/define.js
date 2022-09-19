@@ -31,12 +31,12 @@ export const columnsOrder = [
   },
 ];
 export const columnsSymbol = [
-  {
-    title: 'Type',
-    dataIndex: 'type',
-    key: 'type',
-    align: 'left',
-  },
+  // {
+  //   title: 'Type',
+  //   dataIndex: 'type',
+  //   align: 'left',
+  //   display: false,
+  // },
   {
     title: 'Price',
     dataIndex: 'price',
@@ -60,7 +60,6 @@ export const columnsTradeHistory = [
   {
     title: 'Time',
     dataIndex: 'time',
-    sorter: (a, b) => new Date(a.date*1000) - new Date(b.date*1000),
     key: 'time',
   },
   {

@@ -20,7 +20,7 @@ import ArtunianShovel from '../../images/ArtunianShovel.png';
 const list = [
 		{
 			name: 'Standard Shovel',
-			symbol: 'StandardShovel',
+			symbol: 'SShov',
 			image: StandardShovel,
 			template_id: 19552,
 			scope: 0,
@@ -57,7 +57,7 @@ const list = [
 		},
 		{
 			name: 'Standard Drill',
-			symbol: 'StandardDrill',
+			symbol: 'SDril',
 			image: StandardDrill,
 			template_id: 19553,
       scope: 1,

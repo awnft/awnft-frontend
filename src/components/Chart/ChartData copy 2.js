@@ -32,13 +32,13 @@ function ChartData(props) {
           inverseColors: false,
           opacityFrom: 0.5,
           opacityTo: 0,
-          stops: [0, 0, 0]
+          stops: [0, 90, 100]
         },
       },
       yaxis: {
         labels: {
           formatter: function (val) {
-            return parseFloat(val).toFixed(4)
+            return (val)
           },
         },
         title: {
@@ -52,14 +52,14 @@ function ChartData(props) {
       shared: false,
       y: {
         formatter: function (val) {
-          return parseFloat(val).toFixed(4)
+          return (val)
         }
       }
     }
     };
     const series = [{
-      name: '',
-      data: props.market
+      name: 'XYZ MOTORS',
+      data: props.market.map( item => item.y)
     }];
 		
 		return (

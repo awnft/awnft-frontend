@@ -164,8 +164,7 @@ function Tradding() {
     setTimeout(function(){
       clearData();
     },200)
-    
-  }, [symbolCurent, pairSymbol])
+  }, [symbolCurent, pairSymbol, userAccount])
   useEffect(() => {
     //wax = new waxjs.WaxJS('https://wax.greymass.com', null, null, false);
     wax = new waxjs.WaxJS({
@@ -175,8 +174,20 @@ function Tradding() {
     checkAutoLoginAndLogin();
     
   }, []);
-
+  // useEffect(() => {
+  //   if(userAccount){
+  //     getBlance(userAccount);
+  //     getBlanceNfts(userAccount);
+  //     getOrderBook(userAccount);
+  //   }
+    
+  // }, [userAccount]);
+  
   const clearData = () => {
+    setNoti({
+      status: '',
+      content: '',
+    })
     setCurentPrice(null);
     setBalance(null);
     setBalanceSymbol([]);
@@ -188,11 +199,19 @@ function Tradding() {
     updateData();
   }
   const updateData = () => {
-    if(userAccount){
-      getBlance(userAccount);
-      getBlanceNfts(userAccount);
-    }
     getOrderBook();
+  }
+  const checkFormat = (data) => {
+    return data < 10 ? "0"+data : data
+  }
+  const timeFormat = (time) => {
+    var hour = checkFormat(time.getHours());
+    var minutes = checkFormat(time.getMinutes());
+    var seconds = checkFormat(time.getSeconds());
+    var date = checkFormat(time.getDate());
+    var month = checkFormat(time.getMonth());
+    return [month,date].join`/`+' '+[hour,minutes,seconds].join`:`;
+    
   }
   async function getMarketData() { 
     axios({
@@ -250,14 +269,14 @@ function Tradding() {
           if(item.type == 'buymatch'){
             return {
               type: 'buy',
-              time: [time.getHours(),time.getMinutes(),time.getSeconds()].join`:`,
+              time: timeFormat(time),
               price: toFixPrice(item.bid[0].split` `[0]/item.ask.length),
               amount: item.ask.length
             }
           }else{
             return {
               type: 'sell',
-              time: [time.getHours(),time.getMinutes(),time.getSeconds()].join`:`,
+              time: timeFormat(time),
               price: toFixPrice(item.ask[0].split` `[0]/item.bid.length),
               amount: item.bid.length
             }
@@ -271,32 +290,34 @@ function Tradding() {
         setVolumePriceDay(volumePriceToday);
         setDataMarket([...newMarket]);
         if(userAccount){
-          let newTrade = [...res.data].map(item => {
+          let newTrade = [];
+          res.data.map(item => {
             if(item.asker == userAccount || item.bidder == userAccount){
               
               if(item.type == 'buymatch'){
                 var time = new Date(item.timestamp * 1000)
-                return {
+                newTrade.push({
                   type: 'buy',
-                  time: [time.getHours(),time.getMinutes(),time.getSeconds()].join`:`,
+                  time: timeFormat(time),
                   pair: symbolCurent.symbol + '/' + pairSymbol,
                   price: toFixPrice(item.bid[0].split` `[0]/item.ask.length),
                   amount: item.ask.length,
                   total: item.bid[0].split` `[0],
-                }
+                })
               }else{
                 var time = new Date(item.timestamp * 1000)
-                return {
+                newTrade.push( {
                   type: 'sell',
-                  time: [time.getHours(),time.getMinutes(),time.getSeconds()].join`:`,
+                  time: timeFormat(time),
                   pair: symbolCurent.symbol + '/' + pairSymbol,
                   price: toFixPrice(item.ask[0].split` `[0]/item.bid.length),
                   amount: item.bid.length,
                   total: item.ask[0].split` `[0],
-                }
+                })
               }
             }
           });
+          console.log(newTrade);
           setTradeHistory([...newTrade]);
         }
         
@@ -307,7 +328,6 @@ function Tradding() {
   async function getOrderBook() {
     createBuyOrder();
     createSellOrder();
-
     if (orderBuy.length > 0) {
       setCurentPrice(orderBuy[orderBuy.length - 1].price);
       if (!buyPrice) {
@@ -341,13 +361,13 @@ function Tradding() {
       })
     }).then(res => {
       if (res.data) {
-        const baseOrder = [];
+        var baseOrder = [];
         const baseData = res.data.rows.map(it => {
           var item = it.data;
           if (item.account == userAccount) {
             baseOrder.push({
               id: item.id,
-              time: item.timestamp,
+              time: timeFormat(new Date(item.timestamp*1000)),
               pair: symbolCurent.symbol + '/' + item.bid.split(' ')[1],
               type: 'Buy',
               price: parseFloat(item.bid.split(' ')[0]/item.ask).toFixed(4),
@@ -365,7 +385,8 @@ function Tradding() {
             }
           }
         });
-        setOpenOrderBuy(baseOrder);
+        setOpenOrderBuy([...baseOrder]);
+        
         const processBuyOrder = {};
         for (let i = 0; i < baseData.length; i++) {
           if (!processBuyOrder[baseData[i].price]) {
@@ -420,13 +441,13 @@ function Tradding() {
       })
     }).then(res => {
       if (res.data) {
-        const baseOrder = [];
+        var baseOrder = [];
         const baseData = res.data.rows.map(it => {
           var item = it.data;
           if (item.account == userAccount) {
             baseOrder.push({
               id: item.id,
-              time: item.timestamp,
+              time: timeFormat(new Date(item.timestamp*1000)),
               pair: symbolCurent.symbol + '/' + item.ask.split(' ')[1],
               type: 'Sell',
               price: item.ask.split(' ')[0]/item.bid.length,
@@ -444,7 +465,7 @@ function Tradding() {
             }
           }
         });
-        setOpenOrderSell(baseOrder);
+        setOpenOrderSell([...baseOrder]);
         const processBuyOrder = {};
         for (let i = 0; i < baseData.length; i++) {
           if (!processBuyOrder[baseData[i].price]) {
@@ -488,12 +509,13 @@ function Tradding() {
     }
     var isAutoLoginAwailable = await wax.isAutoLoginAvailable();
     console.log("Auto login", isAutoLoginAwailable);
-    var userAccount2 = wax.userAccount
+    var userAccount2 = wax.user.account;
     setUserAccount(userAccount2);
     // var pubKeys2 = wax.pubKeys
     // setPubKeys(pubKeys2);
     getBlance(userAccount2);
     getBlanceNfts(userAccount2);
+    
     return isAutoLoginAwailable;
   }
   async function buyEvent() {
@@ -634,6 +656,7 @@ function Tradding() {
       getBlance(userAccount2);
       getBlanceNfts(userAccount2);
       setWaxJs(wax);
+      
     } catch (error) {
       console.error('User fail to login.', error);
       setNoti({
@@ -645,44 +668,60 @@ function Tradding() {
   
   const infomationSymbol = () => {
     return (
-      <Row style={{ margin: '10px 0' }}>
+      <Row>
         <Col xs={{ span: 24 }}>
-          <Row justify="start" gutter={16}>
-            <Col md="10" xs="24" >
-              <img src={symbolCurent.image} style={{ maxWidth: '100px' }} />
+          <Row justify="start" gutter={[16,16]}>
+            <Col flex="60px">
+              <img src={symbolCurent.image} style={{ maxWidth: '60px' }} />
             </Col>
-            <Col md="14" xs="24">
+            <Col xs={12} md={4}>
               <Typography.Text>
                   <b> NFT Name: {symbolCurent.name} </b> 
                   <br/>
                   <b>Pair</b>: {symbolCurent.symbol}/{pairSymbol}
                   <br />
                   <b> Template Id </b>: {symbolCurent.template_id}
-                  <br />
+                  <br/>
+              </Typography.Text>
+            </Col>
+            
+            <Col xs={12} md={4}>
+              <Typography.Text>
                   <b>24h Vol </b>: {Intl.NumberFormat().format(volumeDay)} - {symbolCurent.symbol}
                   <br />
                   <b>24h Vol </b>: {Intl.NumberFormat().format(volumePriceDay)} - {pairSymbol}
                   <br />
+              </Typography.Text>
+            </Col>
+            <Col xs={12} md={3}>
+              <Typography.Text>
                   <b> Low </b>: {Intl.NumberFormat().format(priceLowest)}
                   <br/>
                   <b>High</b>: {Intl.NumberFormat().format(priceHighest)}
                   <br/>
               </Typography.Text>
-              <Typography.Text>
+            </Col>
+            <Col xs={12} md={11}>
+              <Space size="small">
                 {symbolCurent?.attributes?.length > 0 && (
                   <>
                     {symbolCurent.attributes.map(item => {
                       return (
-                        <>
-                          <b> {item.key} </b> : {item.value}
-                          <br/>
-                        </>
+                        
+                          <Typography.Text>
+                            <b> {item.key}: </b> {item.value}
+                            <br/>
+                          </Typography.Text>
+                        
                       )
                     })}
                   </>
                 )}
-              </Typography.Text>
+              </Space>
             </Col>
+            
+              
+            
 
           </Row>
         </Col>
@@ -737,7 +776,7 @@ function Tradding() {
         <Menu theme="light" mode="horizontal" defaultSelectedKeys={['mail']} items={menuItems} />
 
       </Header>
-      <Content style={{ padding: '10px 50px' }}>
+      <Content style={{ padding: '10px' }}>
         <Context.Provider
           value={{
             name: 'Notification',
@@ -746,8 +785,8 @@ function Tradding() {
           {contextHolder}
         </Context.Provider>
         
-        <Row justify="start" gutter={16} mt={4}>
-          <Col xs={24} md={7}>
+        <Row justify="start" gutter={[16,16]} mt={4}>
+          <Col xs={24} md={24}>
             {infomationSymbol()}
           </Col>
           <Col xs={24} md={7}>
@@ -767,15 +806,12 @@ function Tradding() {
               }
             })} />
           </Col>
-          <Col xs={0} md={10}>
+          <Col xs={24} md={10}>
             { market.length > 0 && (
               <ChartData market={market} symbol={pairSymbol} name={symbolCurent.name}/>
             )}
 
           </Col>
-          
-        </Row>
-        <Row justify="start" gutter={16}>
           <Col xs={24} md={7}>
             <Table   
               rowClassName={(record, index) => record.type == 'buy' ? 'green' :  'red'}
@@ -786,8 +822,11 @@ function Tradding() {
               size="small" 
             />
           </Col>
-          <Col xs="24" md={{ span: 17 }}>
-            <Row justify="start" gutter={16}>
+        </Row>
+        <Row justify="start" gutter={[16,16]} align="right">
+          
+          <Col xs="24" md={{ span: 10 }}>
+            <Row justify="center" gutter={[16,16]}>
               <Col xs="24" md={{ span: 12 }}>
 
                 <Input.Group size="large"></Input.Group>
@@ -828,7 +867,7 @@ function Tradding() {
               </Col>
             </Row>
           </Col>
-          <Col xs="24" md={{ span: 24 }}>
+          <Col xs="24" md={{ span: 14 }}>
             <Title level={5}>Open orders</Title>
             <Table dataSource={openOrder} columns={[...columnsTradeHistory,{
                 title: 'Action',
