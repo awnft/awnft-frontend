@@ -186,17 +186,17 @@ function Tradding() {
   useEffect(() => {
     //wax = new waxjs.WaxJS('https://wax.greymass.com', null, null, false);
     wax = new waxjs.WaxJS({
-      rpcEndpoint: 'https://wax.greymass.com'
+      rpcEndpoint: rpc_endpoint()
     });
     setWaxJs(wax);
     checkAutoLoginAndLogin();
-    setInterval(function(){
-      updateData();
-      if(userAccount){
-        getBlance(userAccount);
-        getBlanceNfts(userAccount);
-      }
-    },60000)
+    // setInterval(function(){
+    //   updateData();
+    //   if(userAccount){
+    //     getBlance(userAccount);
+    //     getBlanceNfts(userAccount);
+    //   }
+    // },60000)
   }, []);
   // useEffect(() => {
   //   if(userAccount){
@@ -440,10 +440,10 @@ function Tradding() {
       }
     })
       .catch(error => {
-        // setNoti({
-        //   status: 'Get Order Error',
-        //   content: error + ' '+ rpc,
-        // })
+        setNoti({
+          status: 'Get Order Error',
+          content: error + ' '+ rpc,
+        })
         createBuyOrder();
       });
   }
@@ -521,17 +521,17 @@ function Tradding() {
       }
     })
       .catch(error => {
-        // setNoti({
-        //   status: 'Get Order Error',
-        //   content: error +' '+rpc,
-        // })
+        setNoti({
+          status: 'Get Order Error',
+          content: error +' '+rpc,
+        })
         createSellOrder();
       });
   }
   async function checkAutoLoginAndLogin() {
     if (!wax) {
       wax = new waxjs.WaxJS({
-        rpcEndpoint: 'https://wax.greymass.com'
+        rpcEndpoint: rpc_endpoint
       });
       setWaxJs(wax);
     }
@@ -619,8 +619,7 @@ function Tradding() {
   }
   async function callAction(actions) {
     try {
-      const isLogin = await checkAutoLoginAndLogin();
-      if (!isLogin) {
+      if (!userAccount) {
         await login();
       }
       await waxJs.api
@@ -639,7 +638,10 @@ function Tradding() {
             content: 'transaction id: ' + result.transaction_id,
           });
           setTimeout(function(){
-            clearData();
+            if(userAccount){
+              getBlance(userAccount);
+              getBlanceNfts(userAccount);
+            }
           },4000)
           
         })
@@ -675,7 +677,7 @@ function Tradding() {
 
     try {
       wax = new waxjs.WaxJS({
-        rpcEndpoint: 'https://wax.greymass.com'
+        rpcEndpoint: rpc_endpoint()
       });
       const userAccount2 = await wax.login();
       setUserAccount(userAccount2);
