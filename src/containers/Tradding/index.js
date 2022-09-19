@@ -191,7 +191,7 @@ function Tradding() {
     setWaxJs(wax);
     checkAutoLoginAndLogin();
     setInterval(function(){
-      clearData();
+      updateData();
       if(userAccount){
         getBlance(userAccount);
         getBlanceNfts(userAccount);
