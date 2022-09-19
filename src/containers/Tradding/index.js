@@ -177,6 +177,10 @@ function Tradding() {
     setTimeout(function(){
       clearData();
     },200)
+    if(userAccount){
+      getBlance(userAccount);
+      getBlanceNfts(userAccount);
+    }
   }, [symbolCurent, pairSymbol, userAccount])
   useEffect(() => {
     //wax = new waxjs.WaxJS('https://wax.greymass.com', null, null, false);
@@ -533,8 +537,8 @@ function Tradding() {
       setUserAccount(userAccount2);
       // var pubKeys2 = wax.pubKeys
       // setPubKeys(pubKeys2);
-      getBlance(userAccount2);
-      getBlanceNfts(userAccount2);
+      // getBlance(userAccount2);
+      // getBlanceNfts(userAccount2);
     }
     return isAutoLoginAwailable;
   }
@@ -673,8 +677,8 @@ function Tradding() {
       const pubKeys2 = wax.pubKeys;
       console.log('User logged as:', userAccount2, pubKeys);
       setPubKeys(pubKeys2);
-      getBlance(userAccount2);
-      getBlanceNfts(userAccount2);
+      // getBlance(userAccount2);
+      // getBlanceNfts(userAccount2);
       setWaxJs(wax);
       
     } catch (error) {
