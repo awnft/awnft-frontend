@@ -19,10 +19,7 @@ import {
 import {
   LineChartOutlined,
   LoginOutlined,
-  RadiusBottomleftOutlined,
-  RadiusBottomrightOutlined,
-  RadiusUpleftOutlined,
-  RadiusUprightOutlined,
+  ReloadOutlined,
   CloseOutlined,
 } from "@ant-design/icons";
 import Icon from "@ant-design/icons";
@@ -940,7 +937,14 @@ function Tradding() {
               <Col xs="24" md={{ span: 12 }}>
                 <Input.Group size="large"></Input.Group>
                 <Space direction="vertical">
-                  <Title level={5}>Buy {symbolCurent.name} | Limit trade</Title>
+                  <Title level={5}>
+                    Buy {symbolCurent.name}
+                    <span>
+                      {userAccount && (
+                        <Button type="link" icon={<ReloadOutlined />} onClick={() => getBlance(userAccount)}>Reload</Button>
+                      )}
+                    </span>
+                  </Title>
                   <Typography.Text className="ant-form-text" type="secondary">
                     Balance:{" "}
                     {balance ? new Intl.NumberFormat().format(balance) : "-"}{" "}
@@ -1000,14 +1004,23 @@ function Tradding() {
                 <Spin spinning={loading}>
                   <Space direction="vertical">
                     <Title level={5}>
-                      Sell {symbolCurent.name} | Limit trade
+                      Sell {symbolCurent.name} 
+                      <span>
+                        {userAccount && (
+                          <Button type="link" icon={<ReloadOutlined />} onClick={() => getBlanceNfts(userAccount)}>Reload</Button>
+                        )}
+                      </span>
                     </Title>
-
-                    <Typography.Text className="ant-form-text" type="secondary">
-                      Balance: {balanceSymbol.length >= 1000 ? ">=" : ""}
-                      {Intl.NumberFormat().format(balanceSymbol.length)}{" "}
-                      {symbolCurent.name}
-                    </Typography.Text>
+                    <Space>
+                      <Typography.Text className="ant-form-text" type="secondary">
+                        Balance: {balanceSymbol.length >= 1000 ? ">=" : ""}
+                        {Intl.NumberFormat().format(balanceSymbol.length)}{" "}
+                        {symbolCurent.name}
+                        
+                      </Typography.Text>
+                      
+                    </Space>
+                    
                     <Input
                       addonBefore="Price"
                       addonAfter={pairSymbol}
@@ -1063,7 +1076,14 @@ function Tradding() {
             </Row>
           </Col>
           <Col xs="24" md={{ span: 14 }}>
-            <Title level={5}>Open orders</Title>
+            <Title level={5}>
+              Open orders
+              <span>
+                {userAccount && (
+                  <Button type="link" icon={<ReloadOutlined />} onClick={() => getOrderBook()}>Reload</Button>
+                )}
+              </span>
+            </Title>
             <Table
               dataSource={openOrder}
               columns={[
@@ -1085,7 +1105,14 @@ function Tradding() {
               scroll={{ y: 220 }}
             />
             <br />
-            <Title level={5}>Trade history</Title>
+            <Title level={5}>
+              Trade history
+              <span>
+                {userAccount && (
+                  <Button type="link" icon={<ReloadOutlined />} onClick={() => getMarketData()}>Reload</Button>
+                )}
+              </span>
+            </Title>
             <Table
               dataSource={tradeHistory}
               columns={columnsTradeHistory}
