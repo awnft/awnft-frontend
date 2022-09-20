@@ -941,7 +941,13 @@ function Tradding() {
                     Buy {symbolCurent.name}
                     <span>
                       {userAccount && (
-                        <Button type="link" icon={<ReloadOutlined />} onClick={() => getBlance(userAccount)}>Reload</Button>
+                        <Button
+                          type="link"
+                          icon={<ReloadOutlined />}
+                          onClick={() => getBlance(userAccount)}
+                        >
+                          Reload
+                        </Button>
                       )}
                     </span>
                   </Title>
@@ -1004,23 +1010,30 @@ function Tradding() {
                 <Spin spinning={loading}>
                   <Space direction="vertical">
                     <Title level={5}>
-                      Sell {symbolCurent.name} 
+                      Sell {symbolCurent.name}
                       <span>
                         {userAccount && (
-                          <Button type="link" icon={<ReloadOutlined />} onClick={() => getBlanceNfts(userAccount)}>Reload</Button>
+                          <Button
+                            type="link"
+                            icon={<ReloadOutlined />}
+                            onClick={() => getBlanceNfts(userAccount)}
+                          >
+                            Reload
+                          </Button>
                         )}
                       </span>
                     </Title>
                     <Space>
-                      <Typography.Text className="ant-form-text" type="secondary">
+                      <Typography.Text
+                        className="ant-form-text"
+                        type="secondary"
+                      >
                         Balance: {balanceSymbol.length >= 1000 ? ">=" : ""}
                         {Intl.NumberFormat().format(balanceSymbol.length)}{" "}
                         {symbolCurent.name}
-                        
                       </Typography.Text>
-                      
                     </Space>
-                    
+
                     <Input
                       addonBefore="Price"
                       addonAfter={pairSymbol}
@@ -1080,7 +1093,13 @@ function Tradding() {
               Open orders
               <span>
                 {userAccount && (
-                  <Button type="link" icon={<ReloadOutlined />} onClick={() => getOrderBook()}>Reload</Button>
+                  <Button
+                    type="link"
+                    icon={<ReloadOutlined />}
+                    onClick={() => getOrderBook()}
+                  >
+                    Reload
+                  </Button>
                 )}
               </span>
             </Title>
@@ -1109,7 +1128,13 @@ function Tradding() {
               Trade history
               <span>
                 {userAccount && (
-                  <Button type="link" icon={<ReloadOutlined />} onClick={() => getMarketData()}>Reload</Button>
+                  <Button
+                    type="link"
+                    icon={<ReloadOutlined />}
+                    onClick={() => getMarketData()}
+                  >
+                    Reload
+                  </Button>
                 )}
               </span>
             </Title>
