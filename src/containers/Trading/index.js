@@ -90,11 +90,11 @@ function Trading() {
   };
 
   // SetInterval
-  
+
   const [count, setCount] = useState(0);
 
   useInterval(() => {
-    if(count % 30 === 0){
+    if (count % 30 === 0) {
       getOrderBook();
       if (userAccount) {
         getBlance(userAccount);
@@ -102,16 +102,16 @@ function Trading() {
       }
     }
     setCount(count + 1);
-    
+
   }, 1000);
 
   function useInterval(callback, delay) {
     const savedCallback = useRef();
-  
+
     useEffect(() => {
       savedCallback.current = callback;
     }, [callback]);
-  
+
     // Set up the interval.
     useEffect(() => {
       function tick() {
@@ -124,7 +124,7 @@ function Trading() {
     }, [delay]);
   }
 
-  
+
 
   const rpc_endpoint = () => {
     var endpointList = [
@@ -193,10 +193,10 @@ function Trading() {
       axios
         .get(
           `https://wax.api.atomicassets.io/atomicassets/v1/assets?owner=` +
-            userAccount +
-            `&collection_name=alien.worlds&template_id=` +
-            symbolCurent.template_id +
-            `&limit=1000`
+          userAccount +
+          `&collection_name=alien.worlds&template_id=` +
+          symbolCurent.template_id +
+          `&limit=1000`
         )
         .then((res) => {
           if (res.data) {
@@ -290,7 +290,7 @@ function Trading() {
   async function getMarketData() {
     axios({
       method: "post",
-      url: "https://api.cleancodevietnam.com/wax/api/v0/search",
+      url: "/wax/api/v0/search",
       data: {
         mk_id: symbolCurent.scope,
         base_token_sym:
@@ -367,7 +367,7 @@ function Trading() {
               if (item.type == "buymatch") {
                 var time = new Date(item.timestamp * 1000);
                 newTrade.push({
-                  type: item.bidder == userAccount  ? "buy" : "sell",
+                  type: item.bidder == userAccount ? "buy" : "sell",
                   time: timeFormat(time),
                   pair: symbolCurent.symbol + "/" + pairSymbol,
                   price: toFixPrice(item.bid[0].split` `[0] / item.ask.length),
@@ -377,7 +377,7 @@ function Trading() {
               } else {
                 var time = new Date(item.timestamp * 1000);
                 newTrade.push({
-                  type: item.bidder == userAccount  ? "buy" : "sell",
+                  type: item.bidder == userAccount ? "buy" : "sell",
                   time: timeFormat(time),
                   pair: symbolCurent.symbol + "/" + pairSymbol,
                   price: toFixPrice(item.ask[0].split` `[0] / item.bid.length),
@@ -542,7 +542,7 @@ function Trading() {
             if (item.ask.split(symbolDefine[pairSymbol].symbol).length == 2) {
               let price = toFixPrice(
                 item.ask.split(symbolDefine[pairSymbol].symbol)[0] /
-                  item.bid.length
+                item.bid.length
               );
               return {
                 price: "" + toFixPrice(price),
@@ -712,67 +712,67 @@ function Trading() {
             status: "Success",
             content: "transaction id: " + result.transaction_id,
           });
-          if(result.processed.action_traces[0].inline_traces){
-            
+          if (result.processed.action_traces[0].inline_traces) {
+
             var traces = result.processed.action_traces[0].inline_traces;
             var addNft = [];
             var rmNft = [];
             var addBal = 0;
-            console.log('traces',traces)
-            if(actions[0].account == "atomicassets"){
+            console.log('traces', traces)
+            if (actions[0].account == "atomicassets") {
               rmNft = [...actions[0].data.asset_ids]
             }
-            if(actions[0].account == symbolDefine[pairSymbol].code){
+            if (actions[0].account == symbolDefine[pairSymbol].code) {
               addBal = (-1) * actions[0].data.quantity.split` `[0];
             }
 
-            for(let t = 0; t < traces.length; t++){
-              if(traces[t].act.name == "buymatch" || traces[t].act.name == "sellmatch"){
-                console.log('traces[t]',traces[t])
-                if(traces[t].act.name == "buymatch"){
-                  let price = (traces[t].act.data.record.bid.split` `[0])/traces[t].act.data.record.ask.length;
-                  if(traces[t].act.data.record.asker == userAccount ){
-                    
+            for (let t = 0; t < traces.length; t++) {
+              if (traces[t].act.name == "buymatch" || traces[t].act.name == "sellmatch") {
+                console.log('traces[t]', traces[t])
+                if (traces[t].act.name == "buymatch") {
+                  let price = (traces[t].act.data.record.bid.split` `[0]) / traces[t].act.data.record.ask.length;
+                  if (traces[t].act.data.record.asker == userAccount) {
+
                     setNoti({
                       status: 'Buy order matched',
                       content: `${traces[t].act.data.record.bid} at ${price}`,
                     });
                     addNft.push(...traces[t].act.data.record.ask);
-                    
+
                   }
-                  if(traces[t].act.data.record.bidder == userAccount ){
+                  if (traces[t].act.data.record.bidder == userAccount) {
                     setNoti({
                       status: 'Sell order matched',
                       content: `${traces[t].act.data.record.ask.length} ${symbolCurent.symbol} at ${price}`,
                     });
                     addBal += parseFloat(traces[t].act.data.record.bid.split` `[0]);
                   }
-                }else{
-                  if(traces[t].act.data.record.asker == userAccount ){
+                } else {
+                  if (traces[t].act.data.record.asker == userAccount) {
                     setNoti({
                       status: 'Buy order matched',
-                      content: `${traces[t].act.data.record.bid.length} ${symbolCurent.symbol} at ${traces[t].act.data.record.ask.split` `[0]/traces[t].act.data.record.bid.length}`,
+                      content: `${traces[t].act.data.record.bid.length} ${symbolCurent.symbol} at ${traces[t].act.data.record.ask.split` `[0] / traces[t].act.data.record.bid.length}`,
                     });
                     addBal += +traces[t].act.data.record.ask.split` `[0];
                   }
-                  if(traces[t].act.data.record.bidder == userAccount ){
+                  if (traces[t].act.data.record.bidder == userAccount) {
                     setNoti({
                       status: 'Sell order matched',
-                      content: `${traces[t].act.data.record.ask} at ${traces[t].act.data.record.ask.split` `[0]/traces[t].act.data.record.bid.length}`,
+                      content: `${traces[t].act.data.record.ask} at ${traces[t].act.data.record.ask.split` `[0] / traces[t].act.data.record.bid.length}`,
                     });
                     addNft.push(...traces[t].act.data.record.bid);
-                    
+
                   }
                 }
               }
             }
-            
+
             let newBalance = balance + addBal;
-            
+
             let newBalanceSymbol = [...balanceSymbol].filter((x) => rmNft.includes(x) === false);
-            
+
             setBalance(newBalance);
-            setBalanceSymbol([...newBalanceSymbol,...addNft]);
+            setBalanceSymbol([...newBalanceSymbol, ...addNft]);
           }
           console.log(result);
           setTimeout(function () {
@@ -1076,7 +1076,7 @@ function Trading() {
                       value={buyAmount}
                       onChange={(v) => setBuyAmount(Math.floor(v))}
                     />
-                    <div style={{padding: '0px 10px', textAlign: 'center'}}>
+                    <div style={{ padding: '0px 10px', textAlign: 'center' }}>
                       <Slider
                         defaultValue={0}
                         marks={{
@@ -1093,7 +1093,7 @@ function Trading() {
                         }
                       />
                     </div>
-                    
+
                     <Input
                       addonBefore="Total"
                       addonAfter={pairSymbol}
@@ -1140,7 +1140,7 @@ function Trading() {
                           className="ant-form-text"
                           type="secondary"
                         >
-                          <WalletOutlined style={{ fontSize: '16px', color: 'red' }}/> {" "} {balanceSymbol.length >= 1000 ? ">=" : ""}
+                          <WalletOutlined style={{ fontSize: '16px', color: 'red' }} /> {" "} {balanceSymbol.length >= 1000 ? ">=" : ""}
                           {Intl.NumberFormat().format(
                             balanceSymbol.length
                           )}{" "}
@@ -1162,32 +1162,32 @@ function Trading() {
                         value={sellAmount}
                         onChange={(v) => setSellAmount(Math.floor(v))}
                       />
-                      <div style={{padding: '0px 10px', textAlign: 'center'}}>
-                      <Slider
-                        defaultValue={0}
-                        marks={{
-                          0: "0%",
-                          25: "25%",
-                          50: "50%",
-                          75: "75%",
-                          100: "100%",
-                        }}
-                        onChange={(v) =>
-                          setSellAmount(
-                            Math.floor((balanceSymbol.length * v) / 100)
-                          )
-                        }
-                      />
+                      <div style={{ padding: '0px 10px', textAlign: 'center' }}>
+                        <Slider
+                          defaultValue={0}
+                          marks={{
+                            0: "0%",
+                            25: "25%",
+                            50: "50%",
+                            75: "75%",
+                            100: "100%",
+                          }}
+                          onChange={(v) =>
+                            setSellAmount(
+                              Math.floor((balanceSymbol.length * v) / 100)
+                            )
+                          }
+                        />
                       </div>
-                      
+
                       <Input
                         addonBefore="Total"
                         addonAfter={pairSymbol}
                         value={
                           sellPrice && sellAmount
                             ? new Intl.NumberFormat().format(
-                                sellPrice * sellAmount
-                              )
+                              sellPrice * sellAmount
+                            )
                             : ""
                         }
                         disabled
