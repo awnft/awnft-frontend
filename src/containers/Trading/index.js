@@ -989,7 +989,7 @@ function Trading() {
                   margin: "5px",
                 }}
               >
-                
+                {dataMarket.length > 0 ? dataMarket[0].price : ''}
               </div>
               <Spin spinning={loadingElement.orderSell}>
                 <Table
