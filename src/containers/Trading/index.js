@@ -921,7 +921,7 @@ function Trading() {
     },
     {
       key: "SubMenu",
-      label: "Trading Tools",
+      label: "Markets",
       icon: <LineChartOutlined />,
       children: nftsWaxList.map((item) => {
         return {
