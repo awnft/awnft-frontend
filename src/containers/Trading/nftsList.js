@@ -148,7 +148,7 @@ const list = [
 	// },
 	{
 		name: 'Gasrigged Extractor',
-		symbol: 'GasriggedExtractor',
+		symbol: 'Gas',
 		image: GasriggedExtractor,
 		template_id: 19555,
 		scope: 2,
