@@ -234,6 +234,7 @@ function Trading() {
     setOpenOrder([...openOrderBuy, ...openOrderSell]);
   }, [openOrderBuy, openOrderSell]);
   useEffect(() => {
+    setCurentPrice();
     getMarketData();
     setTimeout(function () {
       clearData();
@@ -988,7 +989,7 @@ function Trading() {
                   margin: "5px",
                 }}
               >
-                {curentPrice}
+                
               </div>
               <Spin spinning={loadingElement.orderSell}>
                 <Table
