@@ -31,7 +31,7 @@ import {
   columnsTradeHistory,
   columnsOpenOrder,
   contractName,
-} from "./../../define";
+} from "../../define";
 
 import { Link, useNavigate } from "react-router-dom";
 import { useParams } from "react-router";
@@ -39,7 +39,7 @@ import axios from "axios";
 import ChartData from "../../components/Chart/ChartData";
 import { timeParse } from "d3-time-format";
 import logoPath from "../../assets/awmklogo.png";
-function Tradding() {
+function Trading() {
   var wax;
   const navigate = useNavigate();
   const parseDateTime = timeParse("%Y-%m-%d %H:%M:%S");
@@ -269,7 +269,7 @@ function Tradding() {
           } else {
             return {
               x: new Date(item.timestamp * 1000),
-              y: item.ask[0].split` `[0] / item.bid.length,
+              y: 10000 * item.ask[0].split` `[0] / item.bid.length,
               z: item.bid.length,
             };
           }
@@ -327,7 +327,7 @@ function Tradding() {
               if (item.type == "buymatch") {
                 var time = new Date(item.timestamp * 1000);
                 newTrade.push({
-                  type: "buy",
+                  type: item.bidder == userAccount  ? "buy" : "sell",
                   time: timeFormat(time),
                   pair: symbolCurent.symbol + "/" + pairSymbol,
                   price: toFixPrice(item.bid[0].split` `[0] / item.ask.length),
@@ -337,7 +337,7 @@ function Tradding() {
               } else {
                 var time = new Date(item.timestamp * 1000);
                 newTrade.push({
-                  type: "sell",
+                  type: item.bidder == userAccount  ? "buy" : "sell",
                   time: timeFormat(time),
                   pair: symbolCurent.symbol + "/" + pairSymbol,
                   price: toFixPrice(item.ask[0].split` `[0] / item.bid.length),
@@ -348,7 +348,7 @@ function Tradding() {
             }
           });
           console.log(newTrade);
-          setTradeHistory([...newTrade]);
+          setTradeHistory([...newTrade].reverse());
         }
       }
     });
@@ -733,13 +733,13 @@ function Tradding() {
 
   const infomationSymbol = () => {
     return (
-      <Row>
+      <Row className="frame">
         <Col xs={{ span: 24 }}>
           <Row justify="start" gutter={[16, 16]}>
             <Col flex="60px">
               <img src={symbolCurent.image} style={{ maxWidth: "60px" }} />
             </Col>
-            <Col xs={12} md={4}>
+            <Col xs={12} lg={4}>
               <Typography.Text>
                 <b> NFT Name: {symbolCurent.name} </b>
                 <br />
@@ -750,7 +750,7 @@ function Tradding() {
               </Typography.Text>
             </Col>
 
-            <Col xs={12} md={4}>
+            <Col xs={12} lg={4}>
               <Typography.Text>
                 <b>24h Vol </b>: {Intl.NumberFormat().format(volumeDay)} -{" "}
                 {symbolCurent.symbol}
@@ -760,7 +760,7 @@ function Tradding() {
                 <br />
               </Typography.Text>
             </Col>
-            <Col xs={12} md={3}>
+            <Col xs={12} lg={3}>
               <Typography.Text>
                 <b> Low </b>: {Intl.NumberFormat().format(priceLowest)}
                 <br />
@@ -768,7 +768,7 @@ function Tradding() {
                 <br />
               </Typography.Text>
             </Col>
-            <Col xs={12} md={11}>
+            <Col xs={12} lg={11}>
               <Space size="small">
                 {symbolCurent?.attributes?.length > 0 && (
                   <>
@@ -807,14 +807,14 @@ function Tradding() {
     },
     {
       key: "SubMenu",
-      label: "Tradding Tools",
+      label: "Trading Tools",
       icon: <LineChartOutlined />,
       children: nftsWaxList.map((item) => {
         return {
           key: item.symbol + "TLM",
           label: (
             <span style={{ display: "table-cell", verticalAlign: "top" }}>
-              <Link to={`/tradding/` + item.symbol + "/TLM"}>
+              <Link to={`/trading/` + item.symbol + "/TLM"}>
                 {item.name}/TLM
               </Link>
             </span>
@@ -859,291 +859,320 @@ function Tradding() {
         >
           {contextHolder}
         </Context.Provider>
-
         <Row justify="start" gutter={[16, 16]} mt={4}>
-          <Col xs={24} md={24}>
-            {infomationSymbol()}
-          </Col>
-          <Col xs={24} md={7}>
-            <Spin spinning={loadingElement.orderBuy}>
-              <Table
-                dataSource={orderBuy}
-                columns={columnsOrder}
-                pagination={false}
-                scroll={{ y: 185 }}
-                rowClassName="green"
-                size="small"
-                onRow={(r) => ({
-                  onClick: () => {
-                    setSellPrice(r.price);
-                    setBuyPrice(r.price);
-                  },
-                })}
-              />
-            </Spin>
-            <div
-              style={{
-                float: "left",
-                fontWeight: "bold",
-                fontSize: "20px",
-                margin: "5px",
-              }}
-            >
-              {curentPrice}
+          <Col xs={24}>{infomationSymbol()}</Col>
+        </Row>
+        <Row justify="start" gutter={[16, 16]} mt={4}>
+          <Col xs={24} lg={6}>
+            <div className="maxHeight frame">
+              <Spin spinning={loadingElement.orderBuy}>
+                <Table
+                  dataSource={orderBuy}
+                  columns={columnsOrder}
+                  pagination={false}
+                  scroll={{ y: 185 }}
+                  className="scrollReverse"
+                  rowClassName="green"
+                  size="small"
+                  onRow={(r) => ({
+                    onClick: () => {
+                      setSellPrice(r.price);
+                      setBuyPrice(r.price);
+                    },
+                  })}
+                />
+              </Spin>
+              <div
+                style={{
+                  float: "left",
+                  fontWeight: "bold",
+                  fontSize: "14px",
+                  margin: "5px",
+                }}
+              >
+                {curentPrice}
+              </div>
+              <Spin spinning={loadingElement.orderSell}>
+                <Table
+                  dataSource={orderSell}
+                  columns={columnsOrder}
+                  pagination={false}
+                  showHeader={false}
+                  scroll={{ y: 185 }}
+                  rowClassName="red"
+                  size="small"
+                  onRow={(r) => ({
+                    onClick: () => {
+                      setSellPrice(r.price);
+                      setBuyPrice(r.price);
+                    },
+                  })}
+                />
+              </Spin>
             </div>
-            <Spin spinning={loadingElement.orderSell}>
-              <Table
-                dataSource={orderSell}
-                columns={columnsOrder}
-                pagination={false}
-                showHeader={false}
-                scroll={{ y: 185 }}
-                rowClassName="red"
-                size="small"
-                onRow={(r) => ({
-                  onClick: () => {
-                    setSellPrice(r.price);
-                    setBuyPrice(r.price);
-                  },
-                })}
-              />
-            </Spin>
           </Col>
-          <Col xs={24} md={10}>
+          <Col xs={24} lg={12}>
             {market.length > 0 && (
-              <ChartData
-                market={market}
-                symbol={pairSymbol}
-                name={symbolCurent.name}
-              />
+              <div className="maxHeight frame">
+                <ChartData
+                  market={market}
+                  symbol={pairSymbol}
+                  name={symbolCurent.name}
+                />
+              </div>
             )}
           </Col>
-          <Col xs={24} md={7}>
-            <Table
-              rowClassName={(record, index) =>
-                record.type == "buy" ? "green" : "red"
-              }
-              dataSource={dataMarket}
-              columns={columnsSymbol}
-              pagination={false}
-              scroll={{ y: 380 }}
-              size="small"
-            />
+          <Col xs={24} lg={6}>
+            <div className="maxHeight frame">
+              <Table
+                rowClassName={(record, index) =>
+                  record.type == "buy" ? "green" : "red"
+                }
+                dataSource={dataMarket}
+                columns={columnsSymbol}
+                pagination={false}
+                scroll={{ y: 380 }}
+                size="small"
+              />
+            </div>
           </Col>
         </Row>
         <Row justify="start" gutter={[16, 16]} align="right">
-          <Col xs="24" md={{ span: 10 }}>
-            <Row justify="center" gutter={[16, 16]}>
-              <Col xs="24" md={{ span: 12 }}>
-                <Input.Group size="large"></Input.Group>
-                <Space direction="vertical">
-                  <Title level={5}>
-                    Buy {symbolCurent.name}
-                    <span>
-                      {userAccount && (
-                        <Button
-                          type="link"
-                          icon={<ReloadOutlined />}
-                          onClick={() => getBlance(userAccount)}
-                        >
-                          Reload
-                        </Button>
-                      )}
-                    </span>
-                  </Title>
-                  <Typography.Text className="ant-form-text" type="secondary">
-                    Balance:{" "}
-                    {balance ? new Intl.NumberFormat().format(balance) : "-"}{" "}
-                    {pairSymbol}
-                  </Typography.Text>
-                  <Input
-                    addonBefore="Price"
-                    addonAfter={pairSymbol}
-                    defaultValue=""
-                    value={buyPrice}
-                    onChange={(v) => setBuyPrice(v.target.value)}
-                  />
-                  <InputNumber
-                    min={1}
-                    addonBefore="Amount"
-                    addonAfter={symbolCurent.symbol}
-                    value={buyAmount}
-                    onChange={(v) => setBuyAmount(Math.floor(v))}
-                  />
-
-                  <Slider
-                    defaultValue={0}
-                    marks={{
-                      0: "0%",
-                      25: "25%",
-                      50: "50%",
-                      75: "75%",
-                      100: "100%",
-                    }}
-                    onChange={(v) =>
-                      setBuyAmount(Math.floor(((balance / buyPrice) * v) / 100))
-                    }
-                  />
-                  <Input
-                    addonBefore="Total"
-                    addonAfter={pairSymbol}
-                    defaultValue=""
-                    value={
-                      sellPrice && buyAmount
-                        ? new Intl.NumberFormat().format(buyPrice * buyAmount)
-                        : ""
-                    }
-                    disabled
-                  />
-
-                  <Button
-                    style={{ width: "100%" }}
-                    onClick={buyEvent}
-                    type="primary"
-                    success
-                  >
-                    Buy {symbolCurent.name}
-                  </Button>
-                </Space>
-              </Col>
-              <Col xs="24" md={{ span: 12 }}>
-                <Spin spinning={loading}>
+          <Col xs="24" lg={{ span: 10 }}>
+            <Row justify="center" gutter={[8, 8]}>
+              <Col xs="24" lg={{ span: 12 }}>
+                <div className="frame">
+                  <Input.Group size="large"></Input.Group>
                   <Space direction="vertical">
                     <Title level={5}>
-                      Sell {symbolCurent.name}
+                      Buy {symbolCurent.name}
                       <span>
                         {userAccount && (
                           <Button
                             type="link"
                             icon={<ReloadOutlined />}
-                            onClick={() => getBlanceNfts(userAccount)}
+                            onClick={() => getBlance(userAccount)}
                           >
                             Reload
                           </Button>
                         )}
                       </span>
                     </Title>
-                    <Space>
-                      <Typography.Text
-                        className="ant-form-text"
-                        type="secondary"
-                      >
-                        Balance: {balanceSymbol.length >= 1000 ? ">=" : ""}
-                        {Intl.NumberFormat().format(balanceSymbol.length)}{" "}
-                        {symbolCurent.name}
-                      </Typography.Text>
-                    </Space>
-
+                    <Typography.Text className="ant-form-text" type="secondary">
+                      Balance:{" "}
+                      {balance ? new Intl.NumberFormat().format(balance) : "-"}{" "}
+                      {pairSymbol}
+                    </Typography.Text>
                     <Input
                       addonBefore="Price"
                       addonAfter={pairSymbol}
                       defaultValue=""
-                      value={sellPrice}
-                      onChange={(v) => setSellPrice(v.target.value)}
+                      value={buyPrice}
+                      onChange={(v) => setBuyPrice(v.target.value)}
                     />
                     <InputNumber
                       min={1}
                       addonBefore="Amount"
                       addonAfter={symbolCurent.symbol}
-                      value={sellAmount}
-                      onChange={(v) => setSellAmount(Math.floor(v))}
+                      value={buyAmount}
+                      onChange={(v) => setBuyAmount(Math.floor(v))}
                     />
-                    <Slider
-                      defaultValue={0}
-                      marks={{
-                        0: "0%",
-                        25: "25%",
-                        50: "50%",
-                        75: "75%",
-                        100: "100%",
-                      }}
-                      onChange={(v) =>
-                        setSellAmount(
-                          Math.floor((balanceSymbol.length * v) / 100)
-                        )
-                      }
-                    />
+                    <div style={{padding: '0px 10px', textAlign: 'center'}}>
+                      <Slider
+                        defaultValue={0}
+                        marks={{
+                          0: "0%",
+                          25: "25%",
+                          50: "50%",
+                          75: "75%",
+                          100: "100%",
+                        }}
+                        onChange={(v) =>
+                          setBuyAmount(
+                            Math.floor(((balance / buyPrice) * v) / 100)
+                          )
+                        }
+                      />
+                    </div>
+                    
                     <Input
                       addonBefore="Total"
                       addonAfter={pairSymbol}
+                      defaultValue=""
                       value={
-                        sellPrice && sellAmount
-                          ? new Intl.NumberFormat().format(
-                              sellPrice * sellAmount
-                            )
+                        sellPrice && buyAmount
+                          ? new Intl.NumberFormat().format(buyPrice * buyAmount)
                           : ""
                       }
                       disabled
                     />
+
                     <Button
                       style={{ width: "100%" }}
-                      onClick={sellEvent}
+                      onClick={buyEvent}
                       type="primary"
-                      danger
+                      success
                     >
-                      Sell {symbolCurent.name}
+                      Buy {symbolCurent.name}
                     </Button>
                   </Space>
-                </Spin>
+                </div>
+              </Col>
+              <Col xs="24" lg={{ span: 12 }}>
+                <div className="frame">
+                  <Spin spinning={loading}>
+                    <Space direction="vertical">
+                      <Title level={5}>
+                        Sell {symbolCurent.name}
+                        <span>
+                          {userAccount && (
+                            <Button
+                              type="link"
+                              icon={<ReloadOutlined />}
+                              onClick={() => getBlanceNfts(userAccount)}
+                            >
+                              Reload
+                            </Button>
+                          )}
+                        </span>
+                      </Title>
+                      <Space>
+                        <Typography.Text
+                          className="ant-form-text"
+                          type="secondary"
+                        >
+                          Balance: {balanceSymbol.length >= 1000 ? ">=" : ""}
+                          {Intl.NumberFormat().format(
+                            balanceSymbol.length
+                          )}{" "}
+                          {symbolCurent.name}
+                        </Typography.Text>
+                      </Space>
+
+                      <Input
+                        addonBefore="Price"
+                        addonAfter={pairSymbol}
+                        defaultValue=""
+                        value={sellPrice}
+                        onChange={(v) => setSellPrice(v.target.value)}
+                      />
+                      <InputNumber
+                        min={1}
+                        addonBefore="Amount"
+                        addonAfter={symbolCurent.symbol}
+                        value={sellAmount}
+                        onChange={(v) => setSellAmount(Math.floor(v))}
+                      />
+                      <div style={{padding: '0px 10px', textAlign: 'center'}}>
+                      <Slider
+                        defaultValue={0}
+                        marks={{
+                          0: "0%",
+                          25: "25%",
+                          50: "50%",
+                          75: "75%",
+                          100: "100%",
+                        }}
+                        onChange={(v) =>
+                          setSellAmount(
+                            Math.floor((balanceSymbol.length * v) / 100)
+                          )
+                        }
+                      />
+                      </div>
+                      
+                      <Input
+                        addonBefore="Total"
+                        addonAfter={pairSymbol}
+                        value={
+                          sellPrice && sellAmount
+                            ? new Intl.NumberFormat().format(
+                                sellPrice * sellAmount
+                              )
+                            : ""
+                        }
+                        disabled
+                      />
+                      <Button
+                        style={{ width: "100%" }}
+                        onClick={sellEvent}
+                        type="primary"
+                        danger
+                      >
+                        Sell {symbolCurent.name}
+                      </Button>
+                    </Space>
+                  </Spin>
+                </div>
               </Col>
             </Row>
           </Col>
-          <Col xs="24" md={{ span: 14 }}>
-            <Title level={5}>
-              Open orders
-              <span>
-                {userAccount && (
-                  <Button
-                    type="link"
-                    icon={<ReloadOutlined />}
-                    onClick={() => getOrderBook()}
-                  >
-                    Reload
-                  </Button>
-                )}
-              </span>
-            </Title>
-            <Table
-              dataSource={openOrder}
-              columns={[
-                ...columnsTradeHistory,
-                {
-                  title: "Action",
-                  dataIndex: "action",
-                  align: "center",
-                  render: (_, record) => (
-                    <Space size="middle">
-                      <CloseOutlined
-                        onClick={() => cancelOrder(record.id, record.type)}
-                      />
-                    </Space>
-                  ),
-                },
-              ]}
-              pagination={false}
-              scroll={{ y: 220 }}
-            />
-            <br />
-            <Title level={5}>
-              Trade history
-              <span>
-                {userAccount && (
-                  <Button
-                    type="link"
-                    icon={<ReloadOutlined />}
-                    onClick={() => getMarketData()}
-                  >
-                    Reload
-                  </Button>
-                )}
-              </span>
-            </Title>
-            <Table
-              dataSource={tradeHistory}
-              columns={columnsTradeHistory}
-              pagination={false}
-              scroll={{ y: 220 }}
-            />
+          <Col xs="24" lg={{ span: 14 }}>
+            <div className="frame">
+              <Title level={5}>
+                Open orders
+                <span>
+                  {userAccount && (
+                    <Button
+                      type="link"
+                      icon={<ReloadOutlined />}
+                      onClick={() => getOrderBook()}
+                    >
+                      Reload
+                    </Button>
+                  )}
+                </span>
+              </Title>
+              <Table
+                dataSource={openOrder}
+                columns={[
+                  ...columnsTradeHistory,
+                  {
+                    title: "Action",
+                    dataIndex: "action",
+                    align: "center",
+                    render: (_, record) => (
+                      <Space size="middle">
+                        <CloseOutlined
+                          onClick={() => cancelOrder(record.id, record.type)}
+                        />
+                      </Space>
+                    ),
+                  },
+                ]}
+                pagination={false}
+                scroll={{ y: 220 }}
+                rowClassName={(record, index) =>
+                  record.type == "Buy" ? "green" : "red"
+                }
+                size="small"
+              />
+              <br />
+              <Title level={5}>
+                Trade history
+                <span>
+                  {userAccount && (
+                    <Button
+                      type="link"
+                      icon={<ReloadOutlined />}
+                      onClick={() => getMarketData()}
+                    >
+                      Reload
+                    </Button>
+                  )}
+                </span>
+              </Title>
+              <Table
+                dataSource={tradeHistory}
+                columns={columnsTradeHistory}
+                pagination={false}
+                scroll={{ y: 220 }}
+                rowClassName={(record, index) =>
+                  record.type == "buy" ? "green" : "red"
+                }
+                size="small"
+              />
+            </div>
           </Col>
         </Row>
       </Content>
@@ -1155,4 +1184,4 @@ function Tradding() {
   );
 }
 
-export default Tradding;
+export default Trading;

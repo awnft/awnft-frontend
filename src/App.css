@@ -1,10 +1,27 @@
 @import "~antd/dist/antd.css";
 
+:root {
+  --background-color-base: #f0f2f2;
+  --background-color-secondary: #cdd0d6;
+  --border-2: 1px solid #cdd0d6;
+}
 .red {
   color: red;
 }
 .green {
   color: green;
+}
+.frame {
+  padding: 4px;
+  border-radius: 2px;
+  border: var(--border-2);
+  box-sizing: border-box;
+  background: var(--background-color-base);
+  margin-bottom: 8px;
+}
+
+.maxHeight{
+  height: 400px;
 }
 .App-logo {
   height: 40vmin;
@@ -24,8 +41,13 @@
 .ant-table.ant-table-small tfoot > tr > th,
 .ant-table.ant-table-small tfoot > tr > td {
   padding: 2px !important;
+  font-size: 12px;
+  background: var(--background-color-base);
 }
-
+.scrollReverse .ant-table-body{
+  flex-direction: column-reverse;
+  display: flex;
+}
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;

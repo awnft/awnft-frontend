@@ -5,7 +5,7 @@ function ChartData(props) {
     chart: {
       type: "area",
       stacked: false,
-      height: 350,
+      height: '350px',
       zoom: {
         type: "x",
         enabled: true,
@@ -38,7 +38,7 @@ function ChartData(props) {
     yaxis: {
       labels: {
         formatter: function (val) {
-          return parseFloat(val).toFixed(4);
+          return parseFloat(val/10000).toFixed(4);
         },
       },
       title: {
@@ -52,7 +52,7 @@ function ChartData(props) {
       shared: false,
       y: {
         formatter: function (val) {
-          return parseFloat(val).toFixed(4);
+          return parseFloat(val/10000).toFixed(4);
         },
       },
     },
@@ -66,7 +66,7 @@ function ChartData(props) {
 
   return (
     <div>
-      <Chart options={options} series={series} type="area" />
+      <Chart options={options} series={series} type="area" height="380"/>
     </div>
   );
 }

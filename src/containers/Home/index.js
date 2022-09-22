@@ -24,7 +24,7 @@ import { last, createVerticalLinearGradient, hexToRGBA } from "react-stockcharts
 
 
 
-function Tradding() {
+function Trading() {
   var wax;
   
   const { Title } = Typography;
@@ -465,4 +465,4 @@ function Tradding() {
   );
 }
 
-export default Tradding;
+export default Trading;

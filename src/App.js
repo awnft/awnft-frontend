@@ -6,11 +6,11 @@ import {
   Route,
   useRoutes,
 } from "react-router-dom";
-import Tradding from './containers/Tradding/index';
+import Trading from './containers/Trading/index';
 const App = () => {
   let routes = useRoutes([
-    { path: "/", element: <Tradding /> },
-    { path: "/tradding/:symbol/:pair", element: <Tradding /> },
+    { path: "/", element: <Trading /> },
+    { path: "/trading/:symbol/:pair", element: <Trading /> },
     // ...
   ]);
   return routes;
