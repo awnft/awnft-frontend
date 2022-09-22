@@ -12,8 +12,13 @@ function ChartData(props) {
         autoScaleYaxis: true,
       },
       toolbar: {
-        autoSelected: "zoom",
-      },
+        autoSelected: 'pan',
+        show: false
+      }
+    },
+    // colors: ['#546E7A'],
+    stroke: {
+      width: 2
     },
     dataLabels: {
       enabled: false,
@@ -22,7 +27,7 @@ function ChartData(props) {
       size: 0,
     },
     title: {
-      text: props.name + "//" + props.symbol,
+      //text: props.name + "//" + props.symbol,
       align: "left",
     },
     fill: {
