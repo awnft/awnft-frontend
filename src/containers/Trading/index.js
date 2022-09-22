@@ -21,6 +21,7 @@ import {
   LoginOutlined,
   ReloadOutlined,
   CloseOutlined,
+  WalletOutlined,
 } from "@ant-design/icons";
 import Icon from "@ant-design/icons";
 import nftsWaxList from "./nftsList";
@@ -959,7 +960,7 @@ function Trading() {
                       </span>
                     </Title>
                     <Typography.Text className="ant-form-text" type="secondary">
-                      Balance:{" "}
+                      <WalletOutlined style={{ fontSize: '16px', color: '#52c41a' }} /> {" "}
                       {balance ? new Intl.NumberFormat().format(balance) : "-"}{" "}
                       {pairSymbol}
                     </Typography.Text>
@@ -1041,7 +1042,7 @@ function Trading() {
                           className="ant-form-text"
                           type="secondary"
                         >
-                          Balance: {balanceSymbol.length >= 1000 ? ">=" : ""}
+                          <WalletOutlined style={{ fontSize: '16px', color: 'red' }}/> {" "} {balanceSymbol.length >= 1000 ? ">=" : ""}
                           {Intl.NumberFormat().format(
                             balanceSymbol.length
                           )}{" "}
