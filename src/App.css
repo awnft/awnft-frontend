@@ -1,7 +1,7 @@
 @import "~antd/dist/antd.css";
 
 :root {
-  --background-color-base: #f0f2f2;
+  --background-color-base: #fff;
   --background-color-secondary: #cdd0d6;
   --border-2: 1px solid #cdd0d6;
 }
@@ -43,6 +43,8 @@
 .ant-table.ant-table-small tfoot > tr > td {
   padding: 2px !important;
   font-size: 12px;
+}
+.ant-table.ant-table-small tfoot > tr {
   background: var(--background-color-base);
 }
 .scrollReverse .ant-table-body{
@@ -59,6 +61,10 @@
 .ant-table tfoot > tr > th,
 .ant-table tfoot > tr > td {
   padding: 6px;
+  cursor: 'default';
+}
+.ant-table tfoot > tr:hover {
+  background: var(--background-color-secondary);
 }
 .App-header {
   background-color: #282c34;
