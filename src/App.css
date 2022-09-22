@@ -18,6 +18,7 @@
   box-sizing: border-box;
   background: var(--background-color-base);
   margin-bottom: 8px;
+  overflow: hidden;
 }
 
 .maxHeight{
