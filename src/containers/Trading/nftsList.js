@@ -146,12 +146,43 @@ const list = [
 	// 	image: GlavorDisc,
 	// 	template_id: 19565,
 	// },
-	// {
-	// 	name: 'Gasrigged Extractor',
-	// 	symbol: 'GasriggedExtractor',
-	// 	image: GasriggedExtractor,
-	// 	template_id: 19555,
-	// },
+	{
+		name: 'Gasrigged Extractor',
+		symbol: 'GasriggedExtractor',
+		image: GasriggedExtractor,
+		template_id: 19555,
+		scope: 2,
+		attributes: [
+			{
+				key: 'Rarity',
+				value: 'Common',
+			},
+			{
+				key: 'Shine',
+				value: 'Stone',
+			},
+			{
+				key: 'Type',
+				value: 'Extractor',
+			},
+			{
+				key: 'Delay',
+				value: '540',
+			},
+			{
+				key: 'Difficulty',
+				value: '1'
+			},
+			{
+				key: 'Ease',
+				value: '90'
+			},
+			{
+				key: 'Luck',
+				value: '20'
+			},
+		]
+	},
 	// {
 	// 	name: 'Draxos Axe',
 	// 	symbol: 'DraxosAxe',
