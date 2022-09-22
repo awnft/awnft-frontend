@@ -153,7 +153,7 @@ function Trading() {
   
   const [] = useState(null);
 
-  const [symbolCurent, setSymbolCurent] = useState(nftsWaxList[0]);
+  const [symbolCurent, setSymbolCurent] = useState();
   const [pairSymbol, setPairSymbol] = useState("TLM");
 
   // const [dataSymbol] = useState([...nftsWaxList.map(x => { return { pair: x.symbol + '/Wax', price: '-', volume: '-' } }), ...nftsWaxList.map(x => { return { pair: x.symbol + '/Tlm', price: '-', volume: '-' } })]);
@@ -237,6 +237,8 @@ function Trading() {
         (item) => item.symbol == params.symbol
       );
       setSymbolCurent(newSymbol[0]);
+    }else{
+      setSymbolCurent(nftsWaxList[0])
     }
     if (params.pair) {
       setPairSymbol(params.pair);
@@ -303,9 +305,11 @@ function Trading() {
     return [month, date].join`/` + " " + [hour, minutes, seconds].join`:`;
   };
   async function getMarketData() {
+    // var api_link = "https://api.cleancodevietnam.com";
+    var api_link = "";
     axios({
       method: "post",
-      url: "/wax/api/v0/search",
+      url: api_link+"/wax/api/v0/search",
       data: {
         mk_id: symbolCurent.scope,
         base_token_sym:
@@ -846,69 +850,72 @@ function Trading() {
   }
 
   const infomationSymbol = () => {
-    return (
-      <Row className="frame">
-        <Col xs={{ span: 24 }}>
-          <Row justify="start" gutter={[16, 16]}>
-            <Col flex="60px">
-              <img src={symbolCurent.image} style={{ maxWidth: "60px" }} />
-            </Col>
-            <Col xs={12} lg={4}>
-              <Typography.Text>
-                <b> NFT Name: {symbolCurent.name} </b>
-                <br />
-                <b>Pair</b>: {symbolCurent.symbol}/{pairSymbol}
-                <br />
-                <b> Template Id </b>: {symbolCurent.template_id}
-                <br />
-              </Typography.Text>
-            </Col>
-
-            <Col xs={12} lg={4}>
-              <Typography.Text>
-                <b>24h Vol </b>: {Intl.NumberFormat().format(volumeDay)} -{" "}
-                {symbolCurent.symbol}
-                <br />
-                <b>24h Vol </b>: {Intl.NumberFormat().format(volumePriceDay)} -{" "}
-                {pairSymbol}
-                <br />
-              </Typography.Text>
-            </Col>
-            <Col xs={12} lg={3}>
-              <Typography.Text>
-                <b> Low </b>: {Intl.NumberFormat().format(priceLowest)}
-                <br />
-                <b>High</b>: {Intl.NumberFormat().format(priceHighest)}
-                <br />
-              </Typography.Text>
-            </Col>
-            <Col xs={12} lg={11}>
-              <Space size="small">
-                {symbolCurent.attributes.length > 0 && (
-                  <>
-                    {symbolCurent.attributes.map((item) => {
-                      return (
-                        <Typography.Text>
-                          <b>
-                            {" "}
-                            {item.key.charAt(0).toUpperCase() +
-                              item.key.slice(1)}
-                            :{" "}
-                          </b>{" "}
-                          {item.value}
-                          <br />
-                        </Typography.Text>
-                      );
-                    })}
-                  </>
-                )}
-              </Space>
-            </Col>
-          </Row>
-        </Col>
-        <br />
-      </Row>
-    );
+    if(symbolCurent){
+      return (
+        <Row className="frame">
+          <Col xs={{ span: 24 }}>
+            <Row justify="start" gutter={[16, 16]}>
+              <Col flex="60px">
+                <img src={symbolCurent.image} style={{ maxWidth: "60px" }} />
+              </Col>
+              <Col xs={12} lg={4}>
+                <Typography.Text>
+                  <b> NFT Name: {symbolCurent.name} </b>
+                  <br />
+                  <b>Pair</b>: {symbolCurent.symbol}/{pairSymbol}
+                  <br />
+                  <b> Template Id </b>: {symbolCurent.template_id}
+                  <br />
+                </Typography.Text>
+              </Col>
+  
+              <Col xs={12} lg={4}>
+                <Typography.Text>
+                  <b>24h Vol </b>: {Intl.NumberFormat().format(volumeDay)} -{" "}
+                  {symbolCurent.symbol}
+                  <br />
+                  <b>24h Vol </b>: {Intl.NumberFormat().format(volumePriceDay)} -{" "}
+                  {pairSymbol}
+                  <br />
+                </Typography.Text>
+              </Col>
+              <Col xs={12} lg={3}>
+                <Typography.Text>
+                  <b> Low </b>: {Intl.NumberFormat().format(priceLowest)}
+                  <br />
+                  <b>High</b>: {Intl.NumberFormat().format(priceHighest)}
+                  <br />
+                </Typography.Text>
+              </Col>
+              <Col xs={12} lg={11}>
+                <Space size="small">
+                  {symbolCurent.attributes.length > 0 && (
+                    <>
+                      {symbolCurent.attributes.map((item) => {
+                        return (
+                          <Typography.Text>
+                            <b>
+                              {" "}
+                              {item.key.charAt(0).toUpperCase() +
+                                item.key.slice(1)}
+                              :{" "}
+                            </b>{" "}
+                            {item.value}
+                            <br />
+                          </Typography.Text>
+                        );
+                      })}
+                    </>
+                  )}
+                </Space>
+              </Col>
+            </Row>
+          </Col>
+          <br />
+        </Row>
+      );
+    }
+    
   };
   const Context = React.createContext({
     name: noti.content,
@@ -1059,7 +1066,7 @@ function Trading() {
                   <Input.Group size="large"></Input.Group>
                   <Space direction="vertical">
                     <Title level={5}>
-                      Buy {symbolCurent.name}
+                      Buy {symbolCurent?.name}
                       <span>
                         {userAccount && (
                           <Button
@@ -1087,7 +1094,7 @@ function Trading() {
                     <InputNumber
                       min={1}
                       addonBefore="Amount"
-                      addonAfter={symbolCurent.symbol}
+                      addonAfter={symbolCurent?.symbol}
                       value={buyAmount}
                       onChange={(v) => setBuyAmount(Math.floor(v))}
                     />
@@ -1127,7 +1134,7 @@ function Trading() {
                       type="primary"
                       success
                     >
-                      Buy {symbolCurent.name}
+                      Buy {symbolCurent?.name}
                     </Button>
                   </Space>
                 </div>
@@ -1137,7 +1144,7 @@ function Trading() {
                   <Spin spinning={loading}>
                     <Space direction="vertical">
                       <Title level={5}>
-                        Sell {symbolCurent.name}
+                        Sell {symbolCurent?.name}
                         <span>
                           {userAccount && (
                             <Button
@@ -1159,7 +1166,7 @@ function Trading() {
                           {Intl.NumberFormat().format(
                             balanceSymbol.length
                           )}{" "}
-                          {symbolCurent.name}
+                          {symbolCurent?.name}
                         </Typography.Text>
                       </Space>
 
@@ -1174,7 +1181,7 @@ function Trading() {
                         min={1}
                         max={200}
                         addonBefore="Amount"
-                        addonAfter={symbolCurent.symbol}
+                        addonAfter={symbolCurent?.symbol}
                         value={sellAmount}
                         onChange={(v) => setSellAmount(Math.floor(v))}
                       />
@@ -1214,7 +1221,7 @@ function Trading() {
                         type="primary"
                         danger
                       >
-                        Sell {symbolCurent.name}
+                        Sell {symbolCurent?.name}
                       </Button>
                     </Space>
                   </Spin>
