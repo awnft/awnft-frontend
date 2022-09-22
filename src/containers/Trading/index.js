@@ -95,7 +95,10 @@ function Trading() {
 
   useInterval(() => {
     if (count % 30 === 0) {
-      getOrderBook();
+      if(symbolCurent){
+        getOrderBook();
+      }
+      
       if (userAccount) {
         getBlance(userAccount);
         getBlanceNfts(userAccount);
@@ -252,7 +255,10 @@ function Trading() {
   }, [openOrderBuy, openOrderSell]);
   useEffect(() => {
     setCurentPrice();
-    getMarketData();
+    if(symbolCurent){
+      getMarketData();
+    }
+    
     setTimeout(function () {
       clearData();
       if (userAccount) {
@@ -290,7 +296,10 @@ function Trading() {
     setOpenOrderSell([]);
     setOrderBuy([]);
     setOrderSell([]);
-    getOrderBook();
+    if(symbolCurent){
+      getOrderBook();
+    }
+    
   };
 
   const checkFormat = (data) => {
@@ -306,7 +315,7 @@ function Trading() {
   };
   async function getMarketData() {
     // var api_link = "https://api.cleancodevietnam.com";
-    var api_link = "";
+    var api_link = "https://athenaic.io";
     axios({
       method: "post",
       url: api_link+"/wax/api/v0/search",
