@@ -137,7 +137,21 @@ function Trading() {
     ];
     return endpointList[~~(Math.random() * (endpointList.length - 1))];
   };
-  //const [] = useState(null);
+
+  const nft_endpoint = () => { 
+    var endpointList = [
+      "https://wax.api.atomicassets.io",
+      "https://aa.dapplica.io",
+      "https://wax-aa.eu.eosamsterdam.net",
+      "https://wax-aa.eosdac.io",
+      "https://atomic.wax.eosdetroit.io",
+      "https://atomic.wax.eosrio.io",
+      "https://atomic.wax.tgg.gg"
+    ];
+    return endpointList[~~(Math.random() * (endpointList.length - 1))];
+  };
+  
+  const [] = useState(null);
 
   const [symbolCurent, setSymbolCurent] = useState(nftsWaxList[0]);
   const [pairSymbol, setPairSymbol] = useState("TLM");
@@ -189,14 +203,14 @@ function Trading() {
   const getBlanceNfts = async (userAccount) => {
     if (userAccount) {
       setLoading(true);
-      // console.log(symbolCurent);
+      var nft_rpc = nft_endpoint()
       axios
         .get(
-          `https://wax.api.atomicassets.io/atomicassets/v1/assets?owner=` +
+          nft_rpc+`/atomicassets/v1/assets?owner=` +
           userAccount +
           `&collection_name=alien.worlds&template_id=` +
           symbolCurent.template_id +
-          `&limit=1000`
+          `&limit=200`
         )
         .then((res) => {
           if (res.data) {
@@ -211,6 +225,7 @@ function Trading() {
             status: "Nfts loading Error",
             content: error,
           });
+          getBlanceNfts(userAccount);
         });
     }
   };
@@ -1140,7 +1155,7 @@ function Trading() {
                           className="ant-form-text"
                           type="secondary"
                         >
-                          <WalletOutlined style={{ fontSize: '16px', color: 'red' }} /> {" "} {balanceSymbol.length >= 1000 ? ">=" : ""}
+                          <WalletOutlined style={{ fontSize: '16px', color: 'red' }} /> {" "} {balanceSymbol.length >= 200 ? ">=" : ""}
                           {Intl.NumberFormat().format(
                             balanceSymbol.length
                           )}{" "}
@@ -1157,6 +1172,7 @@ function Trading() {
                       />
                       <InputNumber
                         min={1}
+                        max={200}
                         addonBefore="Amount"
                         addonAfter={symbolCurent.symbol}
                         value={sellAmount}
