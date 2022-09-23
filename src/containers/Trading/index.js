@@ -614,7 +614,7 @@ function Trading() {
   async function checkAutoLoginAndLogin() {
     if (!wax) {
       wax = new waxjs.WaxJS({
-        rpcEndpoint: rpc_endpoint,
+        rpcEndpoint: rpc_endpoint(),
       });
       setWaxJs(wax);
     }
