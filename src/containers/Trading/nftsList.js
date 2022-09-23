@@ -134,18 +134,80 @@ const list = [
 	// 	image: LargeCapacitor,
 	// 	template_id: 19563,
 	// },
-	// {
-	// 	name: 'Infused Extractor',
-	// 	symbol: 'InfusedExtractor',
-	// 	image: InfusedExtractor,
-	// 	template_id: 19556,
-	// },
-	// {
-	// 	name: 'Glavor Disc',
-	// 	symbol: 'GlavorDisc',
-	// 	image: GlavorDisc,
-	// 	template_id: 19565,
-	// },
+	{
+		name: 'Infused Extractor',
+		symbol: 'Infus',
+		image: InfusedExtractor,
+		template_id: 19556,
+		scope: 3,
+		attributes: [
+			{
+				key: 'Rarity',
+				value: 'Common',
+			},
+			{
+				key: 'Shine',
+				value: 'Stone',
+			},
+			{
+				key: 'Type',
+				value: 'Extractor',
+			},
+			{
+				key: 'Delay',
+				value: '360',
+			},
+			{
+				key: 'Difficulty',
+				value: '1'
+			},
+			{
+				key: 'ease',
+				value: '80'
+			},
+			{
+				key: 'luck',
+				value: '0'
+			},
+		]
+	},
+	{
+		name: 'Glavor Disc',
+		symbol: 'Glav',
+		image: GlavorDisc,
+		template_id: 19565,
+		scope: 4,
+		attributes: [
+			{
+				key: 'Rarity',
+				value: 'Rare',
+			},
+			{
+				key: 'Shine',
+				value: 'Stone',
+			},
+			{
+				key: 'Type',
+				value: 'Manipulator',
+			},
+			{
+				key: 'Delay',
+				value: '300',
+			},
+			{
+				key: 'Difficulty',
+				value: '1'
+			},
+			{
+				key: 'Ease',
+				value: '10'
+			},
+			{
+				key: 'Luck',
+				value: '40'
+			},
+		]
+	},
 	{
 		name: 'Gasrigged Extractor',
 		symbol: 'Gas',
@@ -183,12 +245,43 @@ const list = [
 			},
 		]
 	},
-	// {
-	// 	name: 'Draxos Axe',
-	// 	symbol: 'DraxosAxe',
-	// 	image: DraxosAxe,
-	// 	template_id: 19562,
-	// },
+	{
+		name: 'Draxos Axe',
+		symbol: 'Drax',
+		image: DraxosAxe,
+		template_id: 19562,
+		scope: 5,
+		attributes: [
+			{
+				key: 'Rarity',
+				value: 'Rare',
+			},
+			{
+				key: 'Shine',
+				value: 'Stone',
+			},
+			{
+				key: 'Type',
+				value: 'ExoTool',
+			},
+			{
+				key: 'Delay',
+				value: '420',
+			},
+			{
+				key: 'Difficulty',
+				value: '3'
+			},
+			{
+				key: 'Ease',
+				value: '10'
+			},
+			{
+				key: 'Luck',
+				value: '60'
+			},
+		]
+	},
 	// {
 	// 	name: 'Causian Attractor',
 	// 	symbol: 'CausianAttractor',
