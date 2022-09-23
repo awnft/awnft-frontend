@@ -1,21 +1,21 @@
 
 import StandardShovel from '../../images/StandardShovel.png';
 import StandardDrill from '../../images/StandardDrill.png';
-import StandardCapacitor from '../../images/StandardCapacitor.png';
-import RD9000Excavator from '../../images/RD9000Excavator.png';
-import QuarkSeparator from '../../images/QuarkSeparator.png';
-import ProcessingRing from '../../images/ProcessingRing.png';
-import PowerExtractor from '../../images/PowerExtractor.png';
-import LargeExplosive from '../../images/LargeExplosive.png';
-import LargeCapacitor from '../../images/LargeCapacitor.png';
+// import StandardCapacitor from '../../images/StandardCapacitor.png';
+// import RD9000Excavator from '../../images/RD9000Excavator.png';
+// import QuarkSeparator from '../../images/QuarkSeparator.png';
+// import ProcessingRing from '../../images/ProcessingRing.png';
+// import PowerExtractor from '../../images/PowerExtractor.png';
+// import LargeExplosive from '../../images/LargeExplosive.png';
+// import LargeCapacitor from '../../images/LargeCapacitor.png';
 import InfusedExtractor from '../../images/InfusedExtractor.png';
 import GlavorDisc from '../../images/GlavorDisc.png';
 import GasriggedExtractor from '../../images/GasriggedExtractor.png';
 import DraxosAxe from '../../images/DraxosAxe.png';
-import CausianAttractor from '../../images/CausianAttractor.png';
-import BasicTriliumDetector from '../../images/BasicTriliumDetector.png';
-import BarrelDigger from '../../images/BarrelDigger.png';
-import ArtunianShovel from '../../images/ArtunianShovel.png';
+// import CausianAttractor from '../../images/CausianAttractor.png';
+// import BasicTriliumDetector from '../../images/BasicTriliumDetector.png';
+// import BarrelDigger from '../../images/BarrelDigger.png';
+// import ArtunianShovel from '../../images/ArtunianShovel.png';
 
 const list = [
 	{

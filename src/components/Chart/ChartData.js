@@ -1,24 +1,24 @@
-import React, { Component } from "react";
+import React from "react";
 import Chart from "react-apexcharts";
 function ChartData(props) {
   const options = {
     chart: {
       type: "area",
       stacked: false,
-      height: '350px',
+      height: "350px",
       zoom: {
         type: "x",
         enabled: true,
         autoScaleYaxis: true,
       },
       toolbar: {
-        autoSelected: 'pan',
-        show: false
-      }
+        autoSelected: "pan",
+        show: false,
+      },
     },
     // colors: ['#546E7A'],
     stroke: {
-      width: 2
+      width: 2,
     },
     dataLabels: {
       enabled: false,
@@ -43,7 +43,7 @@ function ChartData(props) {
     yaxis: {
       labels: {
         formatter: function (val) {
-          return parseFloat(val/10000).toFixed(4);
+          return parseFloat(val / 10000).toFixed(4);
         },
       },
       title: {
@@ -57,7 +57,7 @@ function ChartData(props) {
       shared: false,
       y: {
         formatter: function (val) {
-          return parseFloat(val/10000).toFixed(4);
+          return parseFloat(val / 10000).toFixed(4);
         },
       },
     },
@@ -71,7 +71,7 @@ function ChartData(props) {
 
   return (
     <div>
-      <Chart options={options} series={series} type="area" height="380"/>
+      <Chart options={options} series={series} type="area" height="380" />
     </div>
   );
 }

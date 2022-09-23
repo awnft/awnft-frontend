@@ -30,20 +30,16 @@ import {
   columnsOrder,
   columnsSymbol,
   columnsTradeHistory,
-  columnsOpenOrder,
   contractName,
 } from "../../define";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useParams } from "react-router";
 import axios from "axios";
 import ChartData from "../../components/Chart/ChartData";
-import { timeParse } from "d3-time-format";
 import logoPath from "../../assets/awmklogo.png";
 function Trading() {
   var wax;
-  const navigate = useNavigate();
-  const parseDateTime = timeParse("%Y-%m-%d %H:%M:%S");
 
   const [pubKeys, setPubKeys] = useState("No Public Keys");
   const params = useParams();
@@ -68,7 +64,7 @@ function Trading() {
   const [sellPrice, setSellPrice] = useState();
   const [buyAmount, setBuyAmount] = useState(1);
   const [sellAmount, setSellAmount] = useState(1);
-  const [curentPrice, setCurentPrice] = useState();
+  const [, setCurentPrice] = useState();
   //----End Form---//
   const [orderSell, setOrderSell] = useState([]);
 
@@ -95,17 +91,16 @@ function Trading() {
 
   useInterval(() => {
     if (count % 30 === 0) {
-      if(symbolCurent){
+      if (symbolCurent) {
         getOrderBook();
       }
-      
+
       if (userAccount) {
         getBlance(userAccount);
         getBlanceNfts(userAccount);
       }
     }
     setCount(count + 1);
-
   }, 1000);
 
   function useInterval(callback, delay) {
@@ -127,8 +122,6 @@ function Trading() {
     }, [delay]);
   }
 
-
-
   const rpc_endpoint = () => {
     var endpointList = [
       "https://wax.eosdac.io",
@@ -141,7 +134,7 @@ function Trading() {
     return endpointList[~~(Math.random() * (endpointList.length - 1))];
   };
 
-  const nft_endpoint = () => { 
+  const nft_endpoint = () => {
     var endpointList = [
       "https://wax.api.atomicassets.io",
       "https://aa.dapplica.io",
@@ -149,18 +142,18 @@ function Trading() {
       "https://wax-aa.eosdac.io",
       "https://atomic.wax.eosdetroit.io",
       "https://atomic.wax.eosrio.io",
-      "https://atomic.wax.tgg.gg"
+      "https://atomic.wax.tgg.gg",
     ];
     return endpointList[~~(Math.random() * (endpointList.length - 1))];
   };
-  
+
   const [] = useState(null);
 
   const [symbolCurent, setSymbolCurent] = useState();
   const [pairSymbol, setPairSymbol] = useState("TLM");
 
   // const [dataSymbol] = useState([...nftsWaxList.map(x => { return { pair: x.symbol + '/Wax', price: '-', volume: '-' } }), ...nftsWaxList.map(x => { return { pair: x.symbol + '/Tlm', price: '-', volume: '-' } })]);
-  const [dataSymbol] = useState([
+  const [] = useState([
     ...nftsWaxList.map((x) => {
       return { pair: x.symbol + "/TLM", price: "-", volume: "-" };
     }),
@@ -206,14 +199,15 @@ function Trading() {
   const getBlanceNfts = async (userAccount) => {
     if (userAccount) {
       setLoading(true);
-      var nft_rpc = nft_endpoint()
+      var nft_rpc = nft_endpoint();
       axios
         .get(
-          nft_rpc+`/atomicassets/v1/assets?owner=` +
-          userAccount +
-          `&collection_name=alien.worlds&template_id=` +
-          symbolCurent.template_id +
-          `&limit=200`
+          nft_rpc +
+            `/atomicassets/v1/assets?owner=` +
+            userAccount +
+            `&collection_name=alien.worlds&template_id=` +
+            symbolCurent.template_id +
+            `&limit=200`
         )
         .then((res) => {
           if (res.data) {
@@ -240,8 +234,8 @@ function Trading() {
         (item) => item.symbol == params.symbol
       );
       setSymbolCurent(newSymbol[0]);
-    }else{
-      setSymbolCurent(nftsWaxList[0])
+    } else {
+      setSymbolCurent(nftsWaxList[0]);
     }
     if (params.pair) {
       setPairSymbol(params.pair);
@@ -254,8 +248,7 @@ function Trading() {
     setOpenOrder([...openOrderBuy, ...openOrderSell]);
   }, [openOrderBuy, openOrderSell]);
   useEffect(() => {
-    
-    if(symbolCurent){
+    if (symbolCurent) {
       getMarketData();
     }
     setTimeout(function () {
@@ -295,10 +288,9 @@ function Trading() {
     setOpenOrderSell([]);
     setOrderBuy([]);
     setOrderSell([]);
-    if(symbolCurent){
+    if (symbolCurent) {
       getOrderBook();
     }
-    
   };
 
   const checkFormat = (data) => {
@@ -315,15 +307,14 @@ function Trading() {
   async function getMarketData() {
     // var api_link = "https://api.cleancodevietnam.com";
     var api_link = "https://athenaic.io";
-    
+
     axios({
       method: "post",
-      url: api_link+"/wax/api/v0/search",
+      url: api_link + "/wax/api/v0/search",
       data: {
         mk_id: symbolCurent.scope,
         base_token_sym:
           symbolDefine[pairSymbol].unit + "," + symbolDefine[pairSymbol].symbol,
-        
       },
     }).then((res) => {
       if (res.data) {
@@ -331,13 +322,13 @@ function Trading() {
           if (item.type == "buymatch") {
             return {
               x: new Date(item.timestamp * 1000),
-              y: 10000 * item.bid[0].split` `[0] / item.ask.length,
+              y: (10000 * item.bid[0].split` `[0]) / item.ask.length,
               z: item.ask.length,
             };
           } else {
             return {
               x: new Date(item.timestamp * 1000),
-              y: 10000 * item.ask[0].split` `[0] / item.bid.length,
+              y: (10000 * item.ask[0].split` `[0]) / item.bid.length,
               z: item.bid.length,
             };
           }
@@ -570,7 +561,7 @@ function Trading() {
             if (item.ask.split(symbolDefine[pairSymbol].symbol).length == 2) {
               let price = toFixPrice(
                 item.ask.split(symbolDefine[pairSymbol].symbol)[0] /
-                item.bid.length
+                  item.bid.length
               );
               return {
                 price: "" + toFixPrice(price),
@@ -741,55 +732,66 @@ function Trading() {
             content: "transaction id: " + result.transaction_id,
           });
           if (result.processed.action_traces[0].inline_traces) {
-
             var traces = result.processed.action_traces[0].inline_traces;
             var addNft = [];
             var rmNft = [];
             var addBal = 0;
-            console.log('traces', traces)
+            console.log("traces", traces);
             if (actions[0].account == "atomicassets") {
-              rmNft = [...actions[0].data.asset_ids]
+              rmNft = [...actions[0].data.asset_ids];
             }
             if (actions[0].account == symbolDefine[pairSymbol].code) {
-              addBal = (-1) * actions[0].data.quantity.split` `[0];
+              addBal = -1 * actions[0].data.quantity.split` `[0];
             }
 
             for (let t = 0; t < traces.length; t++) {
-              if (traces[t].act.name == "buymatch" || traces[t].act.name == "sellmatch") {
-                console.log('traces[t]', traces[t])
+              if (
+                traces[t].act.name == "buymatch" ||
+                traces[t].act.name == "sellmatch"
+              ) {
+                console.log("traces[t]", traces[t]);
                 if (traces[t].act.name == "buymatch") {
-                  let price = (traces[t].act.data.record.bid.split` `[0]) / traces[t].act.data.record.ask.length;
+                  let price =
+                    traces[t].act.data.record.bid.split` `[0] /
+                    traces[t].act.data.record.ask.length;
                   if (traces[t].act.data.record.asker == userAccount) {
-
                     setNoti({
-                      status: 'Buy order matched',
+                      status: "Buy order matched",
                       content: `${traces[t].act.data.record.bid} at ${price}`,
                     });
                     addNft.push(...traces[t].act.data.record.ask);
-
                   }
                   if (traces[t].act.data.record.bidder == userAccount) {
                     setNoti({
-                      status: 'Sell order matched',
+                      status: "Sell order matched",
                       content: `${traces[t].act.data.record.ask.length} ${symbolCurent.symbol} at ${price}`,
                     });
-                    addBal += parseFloat(traces[t].act.data.record.bid.split` `[0]);
+                    addBal += parseFloat(
+                      traces[t].act.data.record.bid.split` `[0]
+                    );
                   }
                 } else {
                   if (traces[t].act.data.record.asker == userAccount) {
                     setNoti({
-                      status: 'Buy order matched',
-                      content: `${traces[t].act.data.record.bid.length} ${symbolCurent.symbol} at ${traces[t].act.data.record.ask.split` `[0] / traces[t].act.data.record.bid.length}`,
+                      status: "Buy order matched",
+                      content: `${traces[t].act.data.record.bid.length} ${
+                        symbolCurent.symbol
+                      } at ${
+                        traces[t].act.data.record.ask.split` `[0] /
+                        traces[t].act.data.record.bid.length
+                      }`,
                     });
                     addBal += +traces[t].act.data.record.ask.split` `[0];
                   }
                   if (traces[t].act.data.record.bidder == userAccount) {
                     setNoti({
-                      status: 'Sell order matched',
-                      content: `${traces[t].act.data.record.ask} at ${traces[t].act.data.record.ask.split` `[0] / traces[t].act.data.record.bid.length}`,
+                      status: "Sell order matched",
+                      content: `${traces[t].act.data.record.ask} at ${
+                        traces[t].act.data.record.ask.split` `[0] /
+                        traces[t].act.data.record.bid.length
+                      }`,
                     });
                     addNft.push(...traces[t].act.data.record.bid);
-
                   }
                 }
               }
@@ -797,7 +799,9 @@ function Trading() {
 
             let newBalance = balance + addBal;
 
-            let newBalanceSymbol = [...balanceSymbol].filter((x) => rmNft.includes(x) === false);
+            let newBalanceSymbol = [...balanceSymbol].filter(
+              (x) => rmNft.includes(x) === false
+            );
 
             setBalance(newBalance);
             setBalanceSymbol([...newBalanceSymbol, ...addNft]);
@@ -859,7 +863,7 @@ function Trading() {
   }
 
   const infomationSymbol = () => {
-    if(symbolCurent){
+    if (symbolCurent) {
       return (
         <Row className="frame">
           <Col xs={{ span: 24 }}>
@@ -877,22 +881,28 @@ function Trading() {
                   <br />
                 </Typography.Text>
               </Col>
-  
+
               <Col xs={12} lg={4}>
                 <Typography.Text>
                   <b>24h Vol </b>: {Intl.NumberFormat().format(volumeDay)} -{" "}
                   {symbolCurent.symbol}
                   <br />
-                  <b>24h Vol </b>: {Intl.NumberFormat().format(volumePriceDay)} -{" "}
-                  {pairSymbol}
+                  <b>24h Vol </b>: {Intl.NumberFormat().format(volumePriceDay)}{" "}
+                  - {pairSymbol}
                   <br />
                 </Typography.Text>
               </Col>
               <Col xs={12} lg={3}>
                 <Typography.Text>
-                  <b> Low </b>: {priceLowest != '99999' ? Intl.NumberFormat().format(priceLowest) : '-'}
+                  <b> Low </b>:{" "}
+                  {priceLowest && priceLowest != "99999" 
+                    ? Intl.NumberFormat().format(priceLowest)
+                    : "-"}
                   <br />
-                  <b>High</b>: {priceHighest ? Intl.NumberFormat().format(priceHighest) : '-'}
+                  <b>High</b>:{" "}
+                  {priceHighest
+                    ? Intl.NumberFormat().format(priceHighest)
+                    : "-"}
                   <br />
                 </Typography.Text>
               </Col>
@@ -924,7 +934,6 @@ function Trading() {
         </Row>
       );
     }
-    
   };
   const Context = React.createContext({
     name: noti.content,
@@ -1020,7 +1029,7 @@ function Trading() {
                   margin: "5px",
                 }}
               >
-                {dataMarket.length > 0 ? dataMarket[0].price : ''}
+                {dataMarket.length > 0 ? dataMarket[0].price : ""}
               </div>
               <Spin spinning={loadingElement.orderSell}>
                 <Table
@@ -1055,7 +1064,7 @@ function Trading() {
           <Col xs={24} lg={6}>
             <div className="maxHeight frame">
               <Table
-                rowClassName={(record, index) =>
+                rowClassName={(record) =>
                   record.type == "buy" ? "green" : "red"
                 }
                 dataSource={dataMarket}
@@ -1089,7 +1098,9 @@ function Trading() {
                       </span>
                     </Title>
                     <Typography.Text className="ant-form-text" type="secondary">
-                      <WalletOutlined style={{ fontSize: '16px', color: '#52c41a' }} /> {" "}
+                      <WalletOutlined
+                        style={{ fontSize: "16px", color: "#52c41a" }}
+                      />{" "}
                       {balance ? new Intl.NumberFormat().format(balance) : "-"}{" "}
                       {pairSymbol}
                     </Typography.Text>
@@ -1107,7 +1118,7 @@ function Trading() {
                       value={buyAmount}
                       onChange={(v) => setBuyAmount(Math.floor(v))}
                     />
-                    <div style={{ padding: '0px 10px', textAlign: 'center' }}>
+                    <div style={{ padding: "0px 10px", textAlign: "center" }}>
                       <Slider
                         defaultValue={0}
                         marks={{
@@ -1171,7 +1182,10 @@ function Trading() {
                           className="ant-form-text"
                           type="secondary"
                         >
-                          <WalletOutlined style={{ fontSize: '16px', color: 'red' }} /> {" "} {balanceSymbol.length >= 200 ? ">=" : ""}
+                          <WalletOutlined
+                            style={{ fontSize: "16px", color: "red" }}
+                          />{" "}
+                          {balanceSymbol.length >= 200 ? ">=" : ""}
                           {Intl.NumberFormat().format(
                             balanceSymbol.length
                           )}{" "}
@@ -1194,7 +1208,7 @@ function Trading() {
                         value={sellAmount}
                         onChange={(v) => setSellAmount(Math.floor(v))}
                       />
-                      <div style={{ padding: '0px 10px', textAlign: 'center' }}>
+                      <div style={{ padding: "0px 10px", textAlign: "center" }}>
                         <Slider
                           defaultValue={0}
                           marks={{
@@ -1218,8 +1232,8 @@ function Trading() {
                         value={
                           sellPrice && sellAmount
                             ? new Intl.NumberFormat().format(
-                              sellPrice * sellAmount
-                            )
+                                sellPrice * sellAmount
+                              )
                             : ""
                         }
                         disabled
@@ -1273,7 +1287,7 @@ function Trading() {
                 ]}
                 pagination={false}
                 scroll={{ y: 220 }}
-                rowClassName={(record, index) =>
+                rowClassName={(record) =>
                   record.type == "Buy" ? "green" : "red"
                 }
                 size="small"
@@ -1298,7 +1312,7 @@ function Trading() {
                 columns={columnsTradeHistory}
                 pagination={false}
                 scroll={{ y: 220 }}
-                rowClassName={(record, index) =>
+                rowClassName={(record) =>
                   record.type == "buy" ? "green" : "red"
                 }
                 size="small"
