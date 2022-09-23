@@ -314,7 +314,7 @@ function Trading() {
     return [month, date].join`/` + " " + [hour, minutes, seconds].join`:`;
   };
   async function getMarketData() {
-    //var api_link = "https://api.cleancodevietnam.com";
+    // var api_link = "https://api.cleancodevietnam.com";
     var api_link = "https://athenaic.io";
     axios({
       method: "post",
@@ -331,7 +331,7 @@ function Trading() {
           if (item.type == "buymatch") {
             return {
               x: new Date(item.timestamp * 1000),
-              y: item.bid[0].split` `[0] / item.ask.length,
+              y: 10000 * item.bid[0].split` `[0] / item.ask.length,
               z: item.ask.length,
             };
           } else {
