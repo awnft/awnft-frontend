@@ -73,8 +73,8 @@ function Trading() {
   const [orderSell, setOrderSell] = useState([]);
 
   // Info pair
-  const [priceHighest, setPriceHighest] = useState(0);
-  const [priceLowest, setPriceLowest] = useState(99999);
+  const [priceHighest, setPriceHighest] = useState();
+  const [priceLowest, setPriceLowest] = useState();
   const [volumeDay, setVolumeDay] = useState(0);
   const [volumePriceDay, setVolumePriceDay] = useState(0);
 
@@ -254,11 +254,10 @@ function Trading() {
     setOpenOrder([...openOrderBuy, ...openOrderSell]);
   }, [openOrderBuy, openOrderSell]);
   useEffect(() => {
-    setCurentPrice();
+    
     if(symbolCurent){
       getMarketData();
     }
-    
     setTimeout(function () {
       clearData();
       if (userAccount) {
@@ -316,6 +315,7 @@ function Trading() {
   async function getMarketData() {
     // var api_link = "https://api.cleancodevietnam.com";
     var api_link = "https://athenaic.io";
+    
     axios({
       method: "post",
       url: api_link+"/wax/api/v0/search",
@@ -346,8 +346,8 @@ function Trading() {
         var today = new Date();
         var volumeToday = 0;
         var volumePriceToday = 0;
-        var highest = priceHighest;
-        var lowest = priceLowest;
+        var highest = 0;
+        var lowest = 99999;
         let newMarket = [...res.data].map((item) => {
           var time = new Date(item.timestamp * 1000);
           if (time > today - 1000 * 60 * 60 * 24) {
@@ -890,9 +890,9 @@ function Trading() {
               </Col>
               <Col xs={12} lg={3}>
                 <Typography.Text>
-                  <b> Low </b>: {Intl.NumberFormat().format(priceLowest)}
+                  <b> Low </b>: {priceLowest != '99999' ? Intl.NumberFormat().format(priceLowest) : '-'}
                   <br />
-                  <b>High</b>: {Intl.NumberFormat().format(priceHighest)}
+                  <b>High</b>: {priceHighest ? Intl.NumberFormat().format(priceHighest) : '-'}
                   <br />
                 </Typography.Text>
               </Col>
