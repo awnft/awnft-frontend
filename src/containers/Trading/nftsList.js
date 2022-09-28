@@ -4,14 +4,15 @@ import StandardDrill from '../../images/StandardDrill.png';
 // import StandardCapacitor from '../../images/StandardCapacitor.png';
 // import RD9000Excavator from '../../images/RD9000Excavator.png';
 // import QuarkSeparator from '../../images/QuarkSeparator.png';
-// import ProcessingRing from '../../images/ProcessingRing.png';
-// import PowerExtractor from '../../images/PowerExtractor.png';
+import ProcessingRing from '../../images/ProcessingRing.png';
+import PowerExtractor from '../../images/PowerExtractor.png';
 // import LargeExplosive from '../../images/LargeExplosive.png';
 // import LargeCapacitor from '../../images/LargeCapacitor.png';
 import InfusedExtractor from '../../images/InfusedExtractor.png';
 import GlavorDisc from '../../images/GlavorDisc.png';
 import GasriggedExtractor from '../../images/GasriggedExtractor.png';
 import DraxosAxe from '../../images/DraxosAxe.png';
+import PowerSaw from '../../images/PowerSaw.png';
 // import CausianAttractor from '../../images/CausianAttractor.png';
 // import BasicTriliumDetector from '../../images/BasicTriliumDetector.png';
 // import BarrelDigger from '../../images/BarrelDigger.png';
@@ -110,18 +111,80 @@ const list = [
 	// 	image: QuarkSeparator,
 	// 	template_id: 19570,
 	// },
-	// {
-	// 	name: 'Processing Ring',
-	// 	symbol: 'ProcessingRing',
-	// 	image: ProcessingRing,
-	// 	template_id: 19564,
-	// },
-	// {
-	// 	name: 'Power Extractor',
-	// 	symbol: 'PowerExtractor',
-	// 	image: PowerExtractor,
-	// 	template_id: 19554,
-	// },
+	{
+		name: 'Processing Ring',
+		symbol: 'Ring',
+		image: ProcessingRing,
+		template_id: 19564,
+		scope: 7,
+		attributes: [
+			{
+				key: 'Rarity',
+				value: 'Rare',
+			},
+			{
+				key: 'Shine',
+				value: 'Stone',
+			},
+			{
+				key: 'Type',
+				value: 'Manipulator',
+			},
+			{
+				key: 'Delay',
+				value: '600',
+			},
+			{
+				key: 'Difficulty',
+				value: '1'
+			},
+			{
+				key: 'ease',
+				value: '10'
+			},
+			{
+				key: 'luck',
+				value: '80'
+			},
+		]
+	},
+	{
+		name: 'Power Extractor',
+		symbol: 'Power',
+		image: PowerExtractor,
+		template_id: 19554,
+		scope: 8,
+		attributes: [
+			{
+				key: 'Rarity',
+				value: 'Common',
+			},
+			{
+				key: 'Shine',
+				value: 'Stone',
+			},
+			{
+				key: 'Type',
+				value: 'Extractor',
+			},
+			{
+				key: 'Delay',
+				value: '270',
+			},
+			{
+				key: 'Difficulty',
+				value: '1'
+			},
+			{
+				key: 'ease',
+				value: '50'
+			},
+			{
+				key: 'luck',
+				value: '10'
+			},
+		]
+	},
 	// {
 	// 	name: 'Large Explosive',
 	// 	symbol: 'LargeExplosive',
@@ -279,6 +342,43 @@ const list = [
 			{
 				key: 'Luck',
 				value: '60'
+			},
+		]
+	},
+	{
+		name: 'Power Saw',
+		symbol: 'Saw',
+		image: PowerSaw,
+		template_id: 19561,
+		scope: 6,
+		attributes: [
+			{
+				key: 'Rarity',
+				value: 'Common',
+			},
+			{
+				key: 'Shine',
+				value: 'Stone',
+			},
+			{
+				key: 'Type',
+				value: 'Manipulator',
+			},
+			{
+				key: 'Delay',
+				value: '360',
+			},
+			{
+				key: 'Difficulty',
+				value: '1'
+			},
+			{
+				key: 'Ease',
+				value: '60'
+			},
+			{
+				key: 'Luck',
+				value: '20'
 			},
 		]
 	},
