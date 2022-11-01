@@ -127,7 +127,6 @@ function Trading() {
       "https://wax.eosdac.io",
       "https://wax.greymass.com",
       "https://wax.api.eosnation.io",
-      "https://wax.eu.eosamsterdam.net",
       "https://wax.eosrio.io",
       "https://api.wax.alohaeos.com",
     ];
@@ -138,7 +137,6 @@ function Trading() {
     var endpointList = [
       "https://wax.api.atomicassets.io",
       "https://aa.dapplica.io",
-      "https://wax-aa.eu.eosamsterdam.net",
       "https://wax-aa.eosdac.io",
       "https://atomic.wax.eosdetroit.io",
       "https://atomic.wax.eosrio.io",
@@ -333,7 +331,8 @@ function Trading() {
             };
           }
         });
-        setMarket([...newData]);
+        
+        setMarket([...newData.sort((a,b)=> a.x - b.x)]);
         var today = new Date();
         var volumeToday = 0;
         var volumePriceToday = 0;

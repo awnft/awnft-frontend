@@ -29,6 +29,7 @@
     "react-tradingview-embed": "^3.0.6",
     "react-typescript-tradingview-embed": "^1.0.8",
     "react-vis": "^1.11.7",
+    "reactour": "^1.18.7",
     "redux": "^4.2.0",
     "stylis": "^4.1.1",
     "ual-lynx": "^0.4.0",

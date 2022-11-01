@@ -54,7 +54,7 @@ function ChartData(props) {
       type: "datetime",
     },
     tooltip: {
-      shared: false,
+      shared: true,
       y: {
         formatter: function (val) {
           return parseFloat(val / 10000).toFixed(4);
@@ -64,7 +64,7 @@ function ChartData(props) {
   };
   const series = [
     {
-      name: "",
+      name: `${props?.name}/${props?.symbol}`,
       data: props.market,
     },
   ];
