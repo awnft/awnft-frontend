@@ -38,6 +38,7 @@ import { useParams } from "react-router";
 import axios from "axios";
 import ChartData from "../../components/Chart/ChartData";
 import logoPath from "../../assets/awmklogo.png";
+
 function Trading() {
   var wax;
 
@@ -65,6 +66,10 @@ function Trading() {
   const [buyAmount, setBuyAmount] = useState(1);
   const [sellAmount, setSellAmount] = useState(1);
   const [, setCurentPrice] = useState();
+
+  const [tlmUsd, setTlmUsd] = useState(null);
+  const [waxUsd, setWaxUsd] = useState(null);
+
   //----End Form---//
   const [orderSell, setOrderSell] = useState([]);
 
@@ -139,7 +144,6 @@ function Trading() {
       "https://aa.dapplica.io",
       "https://wax-aa.eosdac.io",
       "https://atomic.wax.eosdetroit.io",
-      "https://atomic.wax.eosrio.io",
       "https://atomic.wax.tgg.gg",
     ];
     return endpointList[~~(Math.random() * (endpointList.length - 1))];
@@ -216,10 +220,10 @@ function Trading() {
           }
         })
         .catch((error) => {
-          setNoti({
-            status: "Nfts loading Error",
-            content: error,
-          });
+          // setNoti({
+          //   status: "Nfts loading Error",
+          //   content: error,
+          // });
           getBlanceNfts(userAccount);
         });
     }
@@ -271,8 +275,27 @@ function Trading() {
     //     getBlanceNfts(userAccount);
     //   }
     // },60000)
+    getBinancePrice();
   }, []);
-
+  const getBinancePrice = () => {
+    axios
+      .get(`https://api.binance.com/api/v3/avgPrice?symbol=WAXPUSDT`)
+      .then((res) => {
+        console.log(res)
+        setWaxUsd(res?.data?.price)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    axios
+      .get(`https://api.binance.com/api/v3/avgPrice?symbol=TLMUSDT`)
+      .then((res) => {
+        setTlmUsd(res?.data?.price)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
   const clearData = () => {
     setNoti({
       status: "",
@@ -940,7 +963,7 @@ function Trading() {
   const menuItems = [
     {
       key: "logo",
-      label: <img src={logoPath} style={{ maxHeight: "50px" }} />,
+      label: <img src="https://atomichub-ipfs.com/ipfs/QmY8UmFrdU4noFDtB1kDbdEvU1oXQsFXJziqfWTgdwoUGL" style={{ maxHeight: "50px" }} />,
       className: "fontsize150",
     },
     {
@@ -975,6 +998,14 @@ function Trading() {
         <Button onClick={() => login()}>Login</Button>
       ),
       icon: <LoginOutlined />,
+    },
+    {
+      key: "tlmPrice",
+      label: tlmUsd ? `1 TLM = ${new Intl.NumberFormat().format(tlmUsd)} USDT @Binance`: '',
+    },
+    {
+      key: "waxPrice",
+      label: waxUsd ? `1 WAXP = ${new Intl.NumberFormat().format(waxUsd)} USDT @Binance`: '',
     },
   ];
 
@@ -1110,6 +1141,11 @@ function Trading() {
                       value={buyPrice}
                       onChange={(v) => setBuyPrice(v.target.value)}
                     />
+                      {tlmUsd && waxUsd && (
+                        <Typography.Text> 
+                          <small>Price ~ {new Intl.NumberFormat().format(buyPrice * tlmUsd / waxUsd)} WAXP </small>
+                        </Typography.Text>
+                      )}
                     <InputNumber
                       min={1}
                       addonBefore="Amount"
@@ -1146,7 +1182,11 @@ function Trading() {
                       }
                       disabled
                     />
-
+                    {tlmUsd && waxUsd && sellPrice && buyAmount && (
+                        <Typography.Text> 
+                          <small>Total ~ {new Intl.NumberFormat().format(buyPrice * buyAmount * tlmUsd / waxUsd)} WAXP </small>
+                        </Typography.Text>
+                    )}
                     <Button
                       style={{ width: "100%" }}
                       onClick={buyEvent}
@@ -1199,6 +1239,11 @@ function Trading() {
                         value={sellPrice}
                         onChange={(v) => setSellPrice(v.target.value)}
                       />
+                      {tlmUsd && waxUsd && (
+                          <Typography.Text> 
+                            <small>Price ~ {new Intl.NumberFormat().format(sellPrice * tlmUsd / waxUsd)} WAXP </small>
+                          </Typography.Text>
+                      )}
                       <InputNumber
                         min={1}
                         max={200}
@@ -1237,6 +1282,11 @@ function Trading() {
                         }
                         disabled
                       />
+                      {tlmUsd && waxUsd && sellAmount && sellPrice && (
+                          <Typography.Text> 
+                            <small>Total ~ {new Intl.NumberFormat().format(sellPrice * sellAmount * tlmUsd / waxUsd)} WAXP </small>
+                          </Typography.Text>
+                      )}
                       <Button
                         style={{ width: "100%" }}
                         onClick={sellEvent}
