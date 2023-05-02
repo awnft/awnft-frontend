@@ -963,7 +963,7 @@ function Trading() {
   const menuItems = [
     {
       key: "logo",
-      label: <img src="https://atomichub-ipfs.com/ipfs/QmY8UmFrdU4noFDtB1kDbdEvU1oXQsFXJziqfWTgdwoUGL" style={{ maxHeight: "50px" }} />,
+      label: <img src={logoPath} style={{ maxHeight: "50px" }} />,
       className: "fontsize150",
     },
     {
